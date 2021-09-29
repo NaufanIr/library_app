@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:library_app/Bottom_navMenu/HomeNav.dart';
 import 'package:library_app/SplashScreen.dart';
+import 'package:get/get.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -14,10 +15,10 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: "Library App",
       debugShowCheckedModeBanner: false,
-      home:  SplashScreen()
+      home:  SplashScreen(),
     );
   }
 }
@@ -32,3 +33,5 @@ class MyApp extends StatelessWidget {
 
 //namaDB : id16976663_naufanperpustakaan
 //userDB : id16976663_id16976663_root
+
+//FOLDER APK : C:\Users\swift 3\AndroidStudioProjects\Flutter\library_app\android\app\release

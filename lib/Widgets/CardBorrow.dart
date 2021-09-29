@@ -2,26 +2,26 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class CardBorrow extends StatelessWidget {
-  final String id, judul, peminjam, tanggal, durasi;
-  final Function onTap;
+  final String? id, judul, peminjam, tanggal, durasi;
+  final Function? onTap;
 
   CardBorrow({
-    @required this.id,
-    @required this.judul,
-    @required this.peminjam,
-    @required this.tanggal,
-    @required this.durasi,
+    required this.id,
+    required this.judul,
+    required this.peminjam,
+    required this.tanggal,
+    required this.durasi,
     this.onTap,
   });
 
 //BOOK RETURN DATE
-  String returnDate({int year, int month, int day, int durasi}) {
+  String returnDate({required int year, required int month, required int day, required int durasi}) {
     var returnDate = DateTime(year, month, day).add(Duration(days: durasi));
     return DateFormat("d MMM").format(returnDate).toString().toUpperCase();
   }
 
 //BOOK RETURN DAY COUNTDOWN
-  static int returnCountDown({int year, int month, int day, int durasi}) {
+  static int returnCountDown({required int year, required int month, required int day, required int durasi}) {
     var today =
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     var returnDate = DateTime(year, month, day).add(Duration(days: durasi));
@@ -48,7 +48,7 @@ class CardBorrow extends StatelessWidget {
     var tahun = int.parse(tanggal.toString().substring(0, 4));
     var bulan = int.parse(tanggal.toString().substring(5, 7));
     var hari = int.parse(tanggal.toString().substring(8, 10));
-    var duration = int.parse(durasi);
+    var duration = int.parse(durasi!);
 
     String tglKembali =
         returnDate(year: tahun, month: bulan, day: hari, durasi: duration);
@@ -178,7 +178,7 @@ class CardBorrow extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            judul,
+                            judul!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -203,7 +203,7 @@ class CardBorrow extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            peminjam,
+                            peminjam!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -267,7 +267,7 @@ class CardBorrow extends StatelessWidget {
               ),
             ],
           ),
-          onTap: onTap,
+          onTap: onTap as void Function()?,
         ),
       ),
     );

@@ -3,18 +3,18 @@ import 'package:flutter_svg/svg.dart';
 
 class CardBook extends StatelessWidget {
 
-  final String id, judul, pengarang, penerbit, tahun;
-  final int jumlah, index;
-  final Function onTap;
-  final BuildContext context;
-  final AsyncSnapshot snapshot;
+  final String? id, judul, pengarang, penerbit, tahun;
+  final int? jumlah, index;
+  final Function? onTap;
+  final BuildContext? context;
+  final AsyncSnapshot? snapshot;
 
   CardBook({
-    @required this.id,
-    @required this.judul,
-    @required this.pengarang,
-    @required this.penerbit,
-    @required this.tahun,
+    required this.id,
+    required this.judul,
+    required this.pengarang,
+    required this.penerbit,
+    required this.tahun,
     this.jumlah,
     this.onTap,
     this.context,
@@ -36,7 +36,7 @@ class CardBook extends StatelessWidget {
     }
   }
 
-  Widget showJumlah(int jumlah){
+  Widget showJumlah(int? jumlah){
     if(jumlah == null){
       return Container();
     }else{
@@ -94,7 +94,7 @@ class CardBook extends StatelessWidget {
               children: [
                 //JUDUL BUKU
                 Text(
-                  judul,
+                  judul!,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 2,
                   style: TextStyle(
@@ -118,7 +118,7 @@ class CardBook extends StatelessWidget {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           SvgPicture.asset(
-                            "${image(id)}",
+                            "${image(id!)}",
                             height: jumlah == null ? 60 : 70,
                             width: jumlah == null ? 60 : 70,
                           ),
@@ -168,7 +168,7 @@ class CardBook extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    pengarang,
+                                    pengarang!,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                     style: TextStyle(
@@ -193,7 +193,7 @@ class CardBook extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    penerbit,
+                                    penerbit!,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                     style: TextStyle(
@@ -217,7 +217,7 @@ class CardBook extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  tahun,
+                                  tahun!,
                                   style: TextStyle(
                                     fontSize: jumlah == null ? 9 : 10,
                                     color: Color(0xff5C549A),
@@ -234,7 +234,7 @@ class CardBook extends StatelessWidget {
               ],
             ),
           ),
-          onTap: onTap,
+          onTap: onTap as void Function()?,
         ),
       ),
     );

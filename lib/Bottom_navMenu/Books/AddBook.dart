@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:library_app/Models/BooksData.dart';
 import 'package:lottie/lottie.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:toast/toast.dart';
+import 'package:get/get.dart';
 
 class AddBook extends StatefulWidget {
   @override
@@ -31,7 +31,7 @@ class _AddBookState extends State<AddBook> {
     });
   }
 
-  String _genre;
+  String? _genre;
   final List<String> genre = [
     "AB (Auto Biografi)",
     "KP (Komputer)",
@@ -199,7 +199,7 @@ class _AddBookState extends State<AddBook> {
                             return DropdownMenuItem(
                                 value: minggu, child: Text(minggu));
                           }).toList(),
-                          onChanged: (val) {
+                          onChanged: (dynamic val) {
                             setState(() {
                               _genre = val;
                             });
@@ -221,17 +221,22 @@ class _AddBookState extends State<AddBook> {
               ),
               SizedBox(height: 50),
 
-              //Button Simpan & Cetak
-              RaisedButton(
-                child: Text("TAMBAHKAN",
-                    style: TextStyle(
-                        fontFamily: "Montserrat",
-                        fontSize: 12,
-                        color: Colors.white)),
-                color: Colors.blueAccent,
-                padding: EdgeInsets.fromLTRB(50, 13, 50, 13),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(50)),
+              //Button Tambahakan Buku
+              ElevatedButton(
+                child: Text(
+                  "TAMBAHKAN",
+                  style: TextStyle(
+                      fontFamily: "Montserrat",
+                      fontSize: 12,
+                      color: Colors.white),
+                ),
+                style: ElevatedButton.styleFrom(
+                  primary: Colors.blueAccent,
+                  padding: EdgeInsets.fromLTRB(50, 13, 50, 13),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(50),
+                  ),
+                ),
                 onPressed: () {
                   if (judul.text.isEmpty ||
                       pengarang.text.isEmpty ||
@@ -240,16 +245,24 @@ class _AddBookState extends State<AddBook> {
                       jumlah.text.isEmpty ||
                       rak.text.isEmpty ||
                       _genre == null) {
-                    Toast.show(
-                      "Semua data wajib diisi",
-                      context,
-                      duration: 2,
-                      backgroundColor:
-                          Colors.redAccent.shade700.withOpacity(0.7),
-                      gravity: Toast.CENTER,
+                    Get.rawSnackbar(
+                      messageText: Text(
+                        "Semua data wajib diisi",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white,
+                        ),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 10,
+                      ),
+                      borderRadius: 5,
                     );
                   } else {
-                    var id = _genre.substring(0, 2) +
+                    var id = _genre!.substring(0, 2) +
                         rak.text +
                         idCounter.toString().padLeft(3, "0");
                     addBook(
@@ -264,12 +277,21 @@ class _AddBookState extends State<AddBook> {
                         idCounter++;
                         setPref();
                         clear();
-                        Toast.show(
-                          "Buku berhasil ditambahkan",
-                          context,
-                          duration: 3,
+                        Get.rawSnackbar(
+                          messageText: Text(
+                            "Buku berhasil ditambahkan",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white,
+                            ),
+                          ),
                           backgroundColor: Colors.blueAccent,
-                          gravity: Toast.CENTER,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 10,
+                          ),
+                          borderRadius: 5,
                         );
                       },
                     );

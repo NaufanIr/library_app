@@ -1,18 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
-import 'package:library_app/ErrorPage.dart';
 import 'package:library_app/Models/BorrowsData.dart';
 import 'package:library_app/Models/ReturnsData.dart';
 import 'package:library_app/Widgets/CardBorrow.dart';
-import 'package:toast/toast.dart';
 import 'package:lottie/lottie.dart';
 
 class bookReturn extends StatefulWidget {
   var id;
-  int denda;
+  int? denda;
 
-  bookReturn({@required this.id, this.denda});
+  bookReturn({required this.id, this.denda});
 
   @override
   _bookReturnState createState() => _bookReturnState();
@@ -26,14 +25,14 @@ class _bookReturnState extends State<bookReturn> {
 
 //Date Picker
   DateTime _today = DateTime.now();
-  DateTime _selectedDate;
+  DateTime? _selectedDate;
   _selectDate(BuildContext context) async {
-    DateTime newSelectedDate = await showDatePicker(
+    DateTime? newSelectedDate = await showDatePicker(
         context: context,
-        initialDate: _selectedDate != null ? _selectedDate : DateTime.now(),
+        initialDate: _selectedDate != null ? _selectedDate! : DateTime.now(),
         firstDate: DateTime(2000),
         lastDate: DateTime(2040),
-        builder: (BuildContext context, Widget child) {
+        builder: (BuildContext context, Widget? child) {
           return Theme(
             data: ThemeData.dark().copyWith(
               colorScheme: ColorScheme.dark(
@@ -44,20 +43,20 @@ class _bookReturnState extends State<bookReturn> {
               ),
               dialogBackgroundColor: Color(0xff5C549A),
             ),
-            child: child,
+            child: child!,
           );
         });
 
     if (newSelectedDate != null) {
       _selectedDate = newSelectedDate;
-      tgl..text = DateFormat("yyyy-MM-dd").format(_selectedDate);
+      tgl..text = DateFormat("yyyy-MM-dd").format(_selectedDate!);
     }
   }
 
 //Switch Denda
   bool isDenda = false;
-  int totalDenda;
-  Widget showFormDenda(bool denda) {
+  int? totalDenda;
+  Widget? showFormDenda(bool denda) {
     if (denda == false) {
       return Container();
     } else if (denda == true) {
@@ -75,18 +74,8 @@ class _bookReturnState extends State<bookReturn> {
   }
 
 //DropDown Buku Rusak
-  int _selectedRusak = 0;
+  int? _selectedRusak = 0;
   final List<int> rusak = [0, 25000, 75000, 200000];
-
-//SNACKBAR
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  _showSnackBar() {
-    final snackbar = SnackBar(
-        content: Text("Buku telah dikembalikan", textAlign: TextAlign.center),
-        backgroundColor: Colors.green[400],
-        duration: Duration(seconds: 5));
-    _scaffoldKey.currentState.showSnackBar(snackbar);
-  }
 
 //Selesai Pinjam Logic
   void selesaiPinjam() {
@@ -98,17 +87,9 @@ class _bookReturnState extends State<bookReturn> {
     );
   }
 
-  isError() {
-    setState(() {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => ErrorPage()));
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: _scaffoldKey,
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(55),
         child: AppBar(
@@ -125,7 +106,7 @@ class _bookReturnState extends State<bookReturn> {
         future: fetchBorrowById(id: widget.id),
         builder: (context, snapshot) {
           try {
-            final data = snapshot.data[0];
+            final data = snapshot.data![0];
             return SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(5, 10, 5, 30),
@@ -272,7 +253,7 @@ class _bookReturnState extends State<bookReturn> {
                           ),
                           Switch(
                             value: this.isDenda =
-                                widget.denda.isNegative ? !isDenda : isDenda,
+                                widget.denda!.isNegative ? !isDenda : isDenda,
                             onChanged: (val) {
                               setState(
                                 () {
@@ -294,7 +275,7 @@ class _bookReturnState extends State<bookReturn> {
                     ),
 
                     //Button Selesai
-                    RaisedButton(
+                    ElevatedButton(
                       child: Text(
                         "KEMBALIKAN BUKU",
                         style: TextStyle(
@@ -302,20 +283,30 @@ class _bookReturnState extends State<bookReturn> {
                             fontSize: 13,
                             color: Colors.white),
                       ),
-                      color: Colors.blueAccent,
-                      padding: EdgeInsets.fromLTRB(30, 13, 30, 13),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50),
+                      style: ElevatedButton.styleFrom(
+                        primary: Colors.blueAccent,
+                        padding: EdgeInsets.fromLTRB(30, 13, 30, 13),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50),
+                        ),
                       ),
                       onPressed: () {
                         if (tgl.text.isEmpty) {
-                          Toast.show(
-                            "Masukan format waktu yang valid",
-                            context,
-                            duration: 1,
-                            backgroundColor:
-                                Colors.redAccent.shade700.withOpacity(0.7),
-                            gravity: Toast.CENTER,
+                          Get.rawSnackbar(
+                            messageText: Text(
+                              "Masukan format waktu yang valid",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white,
+                              ),
+                            ),
+                            backgroundColor: Colors.redAccent,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 10,
+                            ),
+                            borderRadius: 5,
                           );
                         } else {
                           selesaiPinjam();
@@ -414,7 +405,7 @@ class _bookReturnState extends State<bookReturn> {
                 child: Text("${kalimat(e)}"),
               );
             }).toList(),
-            onChanged: (val) {
+            onChanged: (dynamic val) {
               setState(
                 () {
                   _selectedRusak = val;
@@ -442,7 +433,7 @@ class _bookReturnState extends State<bookReturn> {
               locale: 'id',
               symbol: 'Rp ',
               decimalDigits: 0,
-            ).format(cetakDenda(widget.denda, _selectedRusak))}",
+            ).format(cetakDenda(widget.denda!, _selectedRusak!))}",
             style: TextStyle(
               fontSize: 14,
               fontFamily: "Montserrat",
@@ -498,7 +489,7 @@ class _bookReturnState extends State<bookReturn> {
             Row(
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                FlatButton(
+                TextButton(
                   child:
                       Text("Konfirmasi", style: TextStyle(color: Colors.blue)),
                   onPressed: () {
@@ -510,7 +501,29 @@ class _bookReturnState extends State<bookReturn> {
                     ).then((e) {
                       Navigator.pop(context);
                       Navigator.pop(context);
-                      Toast.show("Buku telah dikembalikan", context);
+                    Get.rawSnackbar(
+                      messageText: Text(
+                        "Buku telah dikembalikan",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white,
+                        ),
+                      ),
+                      backgroundColor:
+                      Colors.blueAccent.withOpacity(0.93),
+                      dismissDirection:
+                      SnackDismissDirection.HORIZONTAL,
+                      margin: EdgeInsets.symmetric(
+                        vertical: 80,
+                        horizontal: 15,
+                      ),
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 10,
+                      ),
+                      borderRadius: 5,
+                    );
                     });
                   },
                 ),

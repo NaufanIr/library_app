@@ -1,38 +1,37 @@
 import "dart:convert";
 import "dart:async";
-import "package:flutter/material.dart";
 import "package:http/http.dart" as http;
 import "package:library_app/API.dart";
 
 Future<List<MembersData>> fetchMembers() async {
-  final response = await http.get("${API.showAnggota}");
-  List jsonResponse = json.decode(response.body);
+  final response = await http.get(Uri.parse("${API.showAnggota}"));
+  List? jsonResponse = json.decode(response.body);
   if (response.statusCode == 200) {
-    return jsonResponse.map((e) => MembersData.fromJson(e)).toList();
+    return jsonResponse!.map((e) => MembersData.fromJson(e)).toList();
   } else {
     throw Exception("Failed to load Members Data");
   }
 }
 
-Future<List<MembersData>> fetchMemberById({@required String id}) async {
+Future<List<MembersData>> fetchMemberById({required String? id}) async {
   var bookID = {'id': id};
-  final response =
-  await http.post("${API.showAnggotaById}", body: json.encode(bookID));
-  List jsonResponse = json.decode(response.body);
+  final response = await http.post(Uri.parse("${API.showAnggotaById}"),
+      body: json.encode(bookID));
+  List? jsonResponse = json.decode(response.body);
   if (response.statusCode == 200) {
-    return jsonResponse.map((e) => MembersData.fromJson(e)).toList();
+    return jsonResponse!.map((e) => MembersData.fromJson(e)).toList();
   } else {
     throw Exception("Failed to load Members Data");
   }
 }
 
 Future<String> addMember({
-  @required String id,
-  @required String nama,
-  @required String kelas,
-  @required String telp,
-  @required String alamat,
-  @required String gender,
+  required String id,
+  required String nama,
+  required String kelas,
+  required String telp,
+  required String alamat,
+  required String gender,
 }) async {
   MembersData membersData = MembersData(
     id: id,
@@ -42,8 +41,8 @@ Future<String> addMember({
     alamat: alamat,
     gender: gender,
   );
-  final response =
-      await http.post("${API.addAnggota}", body: membersData.toJson());
+  final response = await http.post(Uri.parse("${API.addAnggota}"),
+      body: membersData.toJson());
   if (response.statusCode == 200) {
     return response.body;
   } else {
@@ -52,12 +51,12 @@ Future<String> addMember({
 }
 
 Future<String> updtMember({
-  @required String id,
-  @required String nama,
-  @required String kelas,
-  @required String telp,
-  @required String alamat,
-  @required String gender,
+  required String? id,
+  required String nama,
+  required String kelas,
+  required String telp,
+  required String alamat,
+  required String? gender,
 }) async {
   MembersData membersData = MembersData(
     id: id,
@@ -67,8 +66,8 @@ Future<String> updtMember({
     alamat: alamat,
     gender: gender,
   );
-  final response =
-  await http.post("${API.updtAnggota}", body: membersData.toJson());
+  final response = await http.post(Uri.parse("${API.updtAnggota}"),
+      body: membersData.toJson());
   if (response.statusCode == 200) {
     return response.body;
   } else {
@@ -77,20 +76,20 @@ Future<String> updtMember({
 }
 
 class MembersData {
-  final String id;
-  final String nama;
-  final String kelas;
-  final String telp;
-  final String alamat;
-  final String gender;
+  final String? id;
+  final String? nama;
+  final String? kelas;
+  final String? telp;
+  final String? alamat;
+  final String? gender;
 
   MembersData({
-    @required this.id,
-    @required this.nama,
-    @required this.kelas,
-    @required this.telp,
-    @required this.alamat,
-    @required this.gender,
+    required this.id,
+    required this.nama,
+    required this.kelas,
+    required this.telp,
+    required this.alamat,
+    required this.gender,
   });
 
   factory MembersData.fromJson(Map<String, dynamic> json) => MembersData(

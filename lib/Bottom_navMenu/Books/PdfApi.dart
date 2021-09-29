@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart';
@@ -156,7 +155,7 @@ class PdfApi {
     final String dir = (await getApplicationDocumentsDirectory()).path;
     final String path = '$dir/kartu.pdf';
     final File file = File(path);
-    await file.writeAsBytes(pdf.save());
+    await file.writeAsBytes(await pdf.save());
     await OpenFile.open(path);
   }
 }

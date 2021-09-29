@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:library_app/API.dart';
@@ -9,9 +10,11 @@ import 'package:library_app/Bottom_navMenu/Home/BorrowsList.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
 import 'package:library_app/Login.dart';
+import 'package:library_app/Models/BooksData.dart';
 import 'package:library_app/Models/BorrowsData.dart';
+import 'package:library_app/Models/MembersData.dart';
 import 'package:library_app/Widgets/CardBorrow.dart';
-import 'package:toast/toast.dart';
+//import 'package:toast/toast.dart';
 import 'ReturnList.dart';
 
 class Home extends StatefulWidget {
@@ -30,24 +33,6 @@ class _HomeState extends State<Home> {
     return dots;
   }
 
-//GET PEMIJAMAN DATA
-  Future<List> getPeminjaman() async {
-    var data = await http.get("${API.showPeminjaman}");
-    return json.decode(data.body);
-  }
-
-//GET MEMBERS DATA
-  Future<List> getMembers() async {
-    final data = await http.get("${API.showAnggota}");
-    return json.decode(data.body);
-  }
-
-//GET BUKU DATA
-  Future<List> getBooks() async {
-    final data = await http.get("${API.showBuku}");
-    return json.decode(data.body);
-  }
-
 //SCAN QRCODE LOGIC
   String qrData = "";
   Future scanQRCode() async {
@@ -55,7 +40,29 @@ class _HomeState extends State<Home> {
         "#ff6A639F", "Cancel", true, ScanMode.QR);
     fetchBorrowById(id: qrData).then((data) {
       if(data.length == 0){
-        Toast.show("Data tidak ditemukan", context, duration: 2);
+        print(data.length);
+        Get.rawSnackbar(
+          messageText: Text(
+            "Data tidak ditemukan",
+            textAlign: TextAlign.center,
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.white,
+            ),
+          ),
+          snackPosition: SnackPosition.TOP,
+          dismissDirection: SnackDismissDirection.HORIZONTAL,
+          backgroundColor: Colors.redAccent.withOpacity(0.93),
+          margin: EdgeInsets.symmetric(
+            vertical: 54,
+            horizontal: 8,
+          ),
+          padding: EdgeInsets.symmetric(
+            vertical: 20,
+            horizontal: 10,
+          ),
+          borderRadius: 12,
+        );
       }else{
         var id = data[0].id;
         var tanggal = data[0].tanggal;
@@ -99,20 +106,20 @@ class _HomeState extends State<Home> {
             ),
           ),
           backgroundColor: Color(0xff5C549A),
-          actions: [
-            Center(
-              child: Container(
-                margin: EdgeInsets.only(right: 12),
-                child: Text(
-                  "Naufan Ir - Staff",
-                  style: TextStyle(
-                      fontFamily: "Montserrat",
-                      fontSize: 13,
-                      color: Colors.white),
-                ),
-              ),
-            ),
-          ],
+          // actions: [
+          //   Center(
+          //     child: Container(
+          //       margin: EdgeInsets.only(right: 12),
+          //       child: Text(
+          //         "Naufan Ir - Staff",
+          //         style: TextStyle(
+          //             fontFamily: "Montserrat",
+          //             fontSize: 13,
+          //             color: Colors.white),
+          //       ),
+          //     ),
+          //   ),
+          // ],
         ),
       ),
       body: CustomScrollView(
@@ -226,15 +233,15 @@ class _HomeState extends State<Home> {
                               },
                             ),
                             itemCount: 5,
-                            itemBuilder: (BuildContext context, int index) {
-                              final data = snapshot.data[index];
+                            itemBuilder: (BuildContext context, int index, _) {
+                              final data = snapshot.data![index];
                               var tahun = int.parse(
-                                  data.tanggal.substring(0, 4));
+                                  data.tanggal!.substring(0, 4));
                               var bulan = int.parse(
-                                  data.tanggal.substring(5, 7));
+                                  data.tanggal!.substring(5, 7));
                               var hari = int.parse(
-                                  data.tanggal.substring(8, 10));
-                              var duration = int.parse(data.durasi);
+                                  data.tanggal!.substring(8, 10));
+                              var duration = int.parse(data.durasi!);
                               return Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 4,
@@ -304,7 +311,7 @@ class _HomeState extends State<Home> {
                             ),
                           );
                         }
-                      }),
+                      })
                     ),
                   ],
                 ),
@@ -396,8 +403,8 @@ class _HomeState extends State<Home> {
                     ),
 
                     //INFORMASI JUMLAH MEMBER
-                    FutureBuilder(
-                      future: getMembers(),
+                    FutureBuilder<List<MembersData>>(
+                      future: fetchMembers(),
                       builder: (context, snapshot) {
                         if (snapshot.data == null) {
                           return Container(
@@ -408,20 +415,19 @@ class _HomeState extends State<Home> {
                             ),
                           );
                         } else {
-                          int jmlMember = snapshot.data.length;
                           return infoCard(
                             context: context,
                             pict: "images/teamwork.png",
                             caption: "JUMLAH MEMBER : ",
-                            total: jmlMember,
+                            total: snapshot.data!.length,
                           );
                         }
                       },
                     ),
 
                     //INFORMASI JUMLAH BUKU
-                    FutureBuilder(
-                      future: getBooks(),
+                    FutureBuilder<List<BooksData>>(
+                      future: fetchBooks(),
                       builder: (context, snapshot) {
                         if (snapshot.data == null) {
                           return Container(
@@ -432,20 +438,19 @@ class _HomeState extends State<Home> {
                             ),
                           );
                         } else {
-                          int jmlBuku = snapshot.data.length;
                           return infoCard(
                             context: context,
                             pict: "images/books.png",
                             caption: "JUMLAH JUDUL BUKU : ",
-                            total: jmlBuku,
+                            total: snapshot.data!.length,
                           );
                         }
                       },
                     ),
 
                     //INFORMASI JUMLAH BUKU YANG SEDANG DI PINJAM
-                    FutureBuilder(
-                      future: getPeminjaman(),
+                    FutureBuilder<List<BorrowsData>>(
+                      future: fetchBorrows(),
                       builder: (context, snapshot) {
                         if (snapshot.data == null) {
                           return Container(
@@ -456,12 +461,11 @@ class _HomeState extends State<Home> {
                             ),
                           );
                         } else {
-                          int jmlPinjam = snapshot.data.length;
                           return infoCard(
                             context: context,
                             pict: "images/invoice.png",
                             caption: "BUKU YANG SEDANG DI PINJAM : ",
-                            total: jmlPinjam,
+                            total: snapshot.data!.length,
                           );
                         }
                       },
@@ -534,18 +538,18 @@ class _HomeState extends State<Home> {
                 child: ListView(
                   padding: EdgeInsets.fromLTRB(15, 0, 15, 90),
                   children: [
-                    menuDrawer(
-                      caption: "EDIT PROFILE",
-                      onTap: () {},
-                    ),
-                    menuDrawer(
-                      caption: "EDIT PASSWORD",
-                      onTap: () {},
-                    ),
-                    menuDrawer(
-                      caption: "PEGAWAI",
-                      onTap: () {},
-                    ),
+                    // menuDrawer(
+                    //   caption: "EDIT PROFILE",
+                    //   onTap: () {},
+                    // ),
+                    // menuDrawer(
+                    //   caption: "EDIT PASSWORD",
+                    //   onTap: () {},
+                    // ),
+                    // menuDrawer(
+                    //   caption: "PEGAWAI",
+                    //   onTap: () {},
+                    // ),
                     menuDrawer(
                       caption: "DAFTAR PENGEMBALIAN BUKU",
                       onTap: () {
@@ -595,12 +599,12 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Material menuDrawer({@required String caption, Function onTap}) {
+  Material menuDrawer({required String caption, Function? onTap}) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
         splashColor: Colors.blue[500],
-        onTap: onTap,
+        onTap: onTap as void Function()?,
         child: Container(
           padding: EdgeInsets.only(top: 30, bottom: 30),
           decoration: BoxDecoration(
@@ -625,10 +629,10 @@ class _HomeState extends State<Home> {
   }
 
   Container infoCard({
-    @required BuildContext context,
-    @required String pict,
-    @required String caption,
-    @required int total,
+    required BuildContext context,
+    required String pict,
+    required String caption,
+    required int? total,
     //@required Color bgColor,
   }) {
     return Container(

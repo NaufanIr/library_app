@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'Models/BooksData.dart';
 import 'Models/MembersData.dart';
 
-class BooksSearch extends SearchDelegate<List<BooksData>> {
-  Future<List<BooksData>> futureBooksData;
+class BooksSearch extends SearchDelegate<List<BooksData>?> {
+  Future<List<BooksData>>? futureBooksData;
 
   BooksSearch() {
     futureBooksData = fetchBooks();
@@ -48,11 +48,11 @@ class BooksSearch extends SearchDelegate<List<BooksData>> {
         } else if (snapshot.hasData) {
           final data = snapshot.data;
           final suggestionsList = query.isEmpty
-              ? data
-              : data
+              ? data!
+              : data!
                   .where((e) =>
-                      e.judul.toLowerCase().contains(query.toLowerCase()) ||
-                      e.pengarang.toLowerCase().contains(query.toLowerCase()))
+                      e.judul!.toLowerCase().contains(query.toLowerCase()) ||
+                      e.pengarang!.toLowerCase().contains(query.toLowerCase()))
                   .toList();
           if (suggestionsList.isEmpty) {
             return Center(
@@ -96,8 +96,8 @@ class BooksSearch extends SearchDelegate<List<BooksData>> {
   }
 }
 
-class MembersSearch extends SearchDelegate<List<MembersData>> {
-  Future<List<MembersData>> futureMembersData;
+class MembersSearch extends SearchDelegate<List<MembersData>?> {
+  Future<List<MembersData>>? futureMembersData;
 
   MembersSearch() {
     futureMembersData = fetchMembers();
@@ -141,11 +141,11 @@ class MembersSearch extends SearchDelegate<List<MembersData>> {
         } else if (snapshot.hasData) {
           final data = snapshot.data;
           final suggestionsList = query.isEmpty
-              ? data
-              : data
+              ? data!
+              : data!
                   .where((e) =>
-                      e.nama.toLowerCase().contains(query.toLowerCase()) ||
-                      e.id.startsWith(query))
+                      e.nama!.toLowerCase().contains(query.toLowerCase()) ||
+                      e.id!.startsWith(query))
                   .toList();
           if (suggestionsList.isEmpty) {
             return Center(

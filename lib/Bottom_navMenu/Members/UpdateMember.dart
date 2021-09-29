@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:library_app/Models/MembersData.dart';
-import 'package:toast/toast.dart';
 
 class UpdateMember extends StatefulWidget {
   final id;
 
-  UpdateMember({@required this.id});
+  UpdateMember({required this.id});
 
   @override
   _UpdateMemberState createState() => _UpdateMemberState();
 }
 
 class _UpdateMemberState extends State<UpdateMember> {
-  String _selectedGender;
+  String? _selectedGender;
 
   final List<String> genderList = [
     "Laki-laki",
@@ -41,6 +41,7 @@ class _UpdateMemberState extends State<UpdateMember> {
       body: FutureBuilder<List<MembersData>>(
         future: fetchMemberById(id: widget.id),
         builder: (context, snapshot) {
+          print("=============== REFRESH ===============");
           if (snapshot.data == null) {
             return Container(
               width: MediaQuery.of(context).size.width,
@@ -50,7 +51,7 @@ class _UpdateMemberState extends State<UpdateMember> {
               ),
             );
           } else {
-            final data = snapshot.data[0];
+            final data = snapshot.data![0];
             TextEditingController nama =
                 TextEditingController(text: "${data.nama}");
             TextEditingController kelas =
@@ -59,8 +60,7 @@ class _UpdateMemberState extends State<UpdateMember> {
                 TextEditingController(text: "${data.telp}");
             TextEditingController alamat =
                 TextEditingController(text: "${data.alamat}");
-            _selectedGender =
-                data.gender == "L" ? genderList[0] : genderList[1];
+            print("$_selectedGender");
             return SingleChildScrollView(
               padding: EdgeInsets.fromLTRB(5, 20, 5, 30),
               child: Column(
@@ -124,22 +124,25 @@ class _UpdateMemberState extends State<UpdateMember> {
 
                           //DROPDOWN GENDER
                           DropdownButtonFormField(
-                            decoration:
-                                InputDecoration(border: OutlineInputBorder()),
+                            decoration: InputDecoration(
+                              border: OutlineInputBorder()
+                            ),
                             hint: Text("Jenis Kelamin"),
-                            value: _selectedGender,
+                            value:
+                            data.gender == "L" ? genderList[0] : genderList[1],
                             items: genderList.map(
                               (val) {
                                 return DropdownMenuItem(
-                                    value: val, child: Text(val));
+                                  value: val,
+                                  child: Text(val),
+                                );
                               },
                             ).toList(),
-                            onChanged: (val) {
-                              setState(
-                                () {
-                                  _selectedGender = val;
-                                },
-                              );
+                            onChanged: (String? val) {
+                              setState(() {
+                                  _selectedGender = val!;
+                                });
+                              print("onChanged : $_selectedGender || $val");
                             },
                           ),
                           SizedBox(height: 17),
@@ -160,46 +163,74 @@ class _UpdateMemberState extends State<UpdateMember> {
                   SizedBox(height: 50),
 
                   //BUTTON SIMPAN
-                  RaisedButton(
+                  ElevatedButton(
                     child: Text("SIMPAN",
                         style: TextStyle(
                             fontFamily: "Montserrat",
                             fontSize: 12,
                             color: Colors.white)),
-                    color: Colors.blueAccent,
-                    padding: EdgeInsets.fromLTRB(35, 13, 35, 13),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(50)),
+                    style: ElevatedButton.styleFrom(
+                      primary: Colors.blueAccent,
+                      padding: EdgeInsets.fromLTRB(35, 13, 35, 13),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(50)),
+                    ),
                     onPressed: () {
+                      print(_selectedGender);
                       if (nama.text.isEmpty ||
                           kelas.text.isEmpty ||
                           telp.text.isEmpty ||
                           alamat.text.isEmpty) {
-                        Toast.show(
-                          "Semua data wajib diisi",
-                          context,
-                          duration: 2,
-                          backgroundColor:
-                              Colors.redAccent.shade700.withOpacity(0.7),
-                          gravity: Toast.CENTER,
+                        Get.rawSnackbar(
+                          messageText: Text(
+                            "Semua data wajib diisi",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white,
+                            ),
+                          ),
+                          backgroundColor: Colors.redAccent,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 10,
+                          ),
+                          borderRadius: 5,
                         );
                       } else {
+                        print("SIMPAN = $_selectedGender");
                         updtMember(
                           id: data.id,
                           nama: nama.text,
                           kelas: kelas.text,
                           telp: telp.text,
                           alamat: alamat.text,
-                          gender: _selectedGender,
+                          gender: _selectedGender == "Perempuan" ? "P" : "L",
                         ).then(
                           (val) {
                             Navigator.pop(context);
-                            Toast.show(
-                              "Berhasil merubah data anggota",
-                              context,
-                              duration: 3,
-                              backgroundColor: Colors.blueAccent,
-                              gravity: Toast.BOTTOM,
+                            Get.rawSnackbar(
+                              messageText: Text(
+                                "Berhasil merubah data anggota",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              backgroundColor:
+                              Colors.blueAccent.withOpacity(0.93),
+                              dismissDirection:
+                              SnackDismissDirection.HORIZONTAL,
+                              margin: EdgeInsets.symmetric(
+                                vertical: 80,
+                                horizontal: 15,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 10,
+                              ),
+                              borderRadius: 5,
                             );
                           },
                         );

@@ -39,12 +39,12 @@ class _MembersState extends State<Members> {
   // }
 
   Future popUp({
-    @required String nama,
-    @required String id,
-    @required String kelas,
-    @required String telp,
-    @required String alamat,
-    @required String gender,
+    required String? nama,
+    required String? id,
+    required String? kelas,
+    required String? telp,
+    required String? alamat,
+    required String? gender,
   }) async {
     await Future.delayed(Duration(milliseconds: 250));
     return showDialog(
@@ -149,7 +149,7 @@ class _MembersState extends State<Members> {
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final data = snapshot.data[index];
+                      final data = snapshot.data![index];
                       return Padding(
                         padding: EdgeInsets.all(7),
                         child: CardMember(
@@ -172,7 +172,7 @@ class _MembersState extends State<Members> {
                         ),
                       );
                     },
-                    childCount: snapshot.data.length,
+                    childCount: snapshot.data!.length,
                   ),
                 );
               }
@@ -224,12 +224,12 @@ class _MembersState extends State<Members> {
 
   Dialog dialogMenu(
       BuildContext context,
-      {@required String nama,
-        @required String id,
-        @required String kelas,
-        @required String telp,
-        @required String alamat,
-        @required String gender,}) {
+      {required String? nama,
+        required String? id,
+        required String? kelas,
+        required String? telp,
+        required String? alamat,
+        required String? gender,}) {
     int typeCard = 2;
     return Dialog(
       shape: RoundedRectangleBorder(

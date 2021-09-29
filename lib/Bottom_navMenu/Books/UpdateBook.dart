@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:library_app/Models/BooksData.dart';
-import 'package:toast/toast.dart';
+//import 'package:toast/toast.dart';
 
 class UpdateBook extends StatelessWidget {
   final id;
 
-  UpdateBook({@required this.id});
+  UpdateBook({required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -38,8 +39,8 @@ class UpdateBook extends StatelessWidget {
               ),
             );
           } else {
-            final data = snapshot.data[0];
-            var noRak = data.id.substring(2, 4);
+            final data = snapshot.data![0];
+            var noRak = data.id!.substring(2, 4);
             TextEditingController judul =
                 TextEditingController(text: "${data.judul}");
             TextEditingController pengarang =
@@ -155,13 +156,21 @@ class UpdateBook extends StatelessWidget {
                           penerbit.text.isEmpty ||
                           tahun.text.isEmpty ||
                           jumlah.text.isEmpty) {
-                        Toast.show(
-                          "Semua data wajib diisi",
-                          context,
-                          duration: 2,
-                          backgroundColor:
-                              Colors.redAccent.shade700.withOpacity(0.7),
-                          gravity: Toast.CENTER,
+                        Get.rawSnackbar(
+                          messageText: Text(
+                            "Semua data wajib diisi",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 13,
+                              color: Colors.white,
+                            ),
+                          ),
+                          backgroundColor: Colors.redAccent,
+                          padding: EdgeInsets.symmetric(
+                            vertical: 12,
+                            horizontal: 10,
+                          ),
+                          borderRadius: 5,
                         );
                       } else {
                         updateBook(
@@ -173,13 +182,30 @@ class UpdateBook extends StatelessWidget {
                           jumlah: jumlah.text,
                         ).then(
                           (val) {
+                            print("--------- $val");
                             Navigator.pop(context);
-                            Toast.show(
-                              "Berhasil merubah data buku",
-                              context,
-                              duration: 3,
-                              backgroundColor: Colors.blueAccent,
-                              gravity: Toast.BOTTOM,
+                            Get.rawSnackbar(
+                              messageText: Text(
+                                "Berhasil merubah data buku",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              backgroundColor:
+                                  Colors.blueAccent.withOpacity(0.93),
+                              dismissDirection:
+                                  SnackDismissDirection.HORIZONTAL,
+                              margin: EdgeInsets.symmetric(
+                                vertical: 80,
+                                horizontal: 15,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 10,
+                              ),
+                              borderRadius: 5,
                             );
                           },
                         );

@@ -1,20 +1,20 @@
 import 'package:flutter/material.dart';
 
 class CardMember extends StatelessWidget {
-  final String id, nama, kelas, telp, alamat, gender;
-  int typeCard = 1;
-  final int index;
-  final Function onTap;
-  final BuildContext context;
-  final AsyncSnapshot snapshot;
+  final String? id, nama, kelas, telp, alamat, gender;
+  int? typeCard = 1;
+  final int? index;
+  final Function? onTap;
+  final BuildContext? context;
+  final AsyncSnapshot? snapshot;
 
   CardMember(
-      {@required this.id,
-      @required this.nama,
-      @required this.kelas,
-      @required this.telp,
-      @required this.alamat,
-      @required this.gender,
+      {required this.id,
+      required this.nama,
+      required this.kelas,
+      required this.telp,
+      required this.alamat,
+      required this.gender,
       this.typeCard,
       this.index,
       this.onTap,
@@ -48,7 +48,7 @@ class CardMember extends StatelessWidget {
               children: [
                 //NAMA
                 Text(
-                  nama,
+                  nama!,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: TextStyle(
@@ -116,7 +116,7 @@ class CardMember extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  kelas,
+                                  kelas!,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: TextStyle(
@@ -140,7 +140,7 @@ class CardMember extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    telp,
+                                    telp!,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                     style: TextStyle(
@@ -194,7 +194,7 @@ class CardMember extends StatelessWidget {
               ],
             ),
           ),
-          onTap: onTap,
+          onTap: onTap as void Function()?,
         ),
       ),
     );

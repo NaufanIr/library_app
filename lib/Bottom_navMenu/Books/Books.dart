@@ -7,7 +7,7 @@ import 'package:library_app/Bottom_navMenu/Books/UpdateBook.dart';
 import 'package:library_app/Models/BooksData.dart';
 import 'package:library_app/Search.dart';
 import 'package:library_app/Widgets/CardBook.dart';
-import 'package:toast/toast.dart';
+//import 'package:toast/toast.dart';
 
 class Books extends StatefulWidget {
   @override
@@ -16,11 +16,11 @@ class Books extends StatefulWidget {
 
 class _BooksState extends State<Books> {
   Future popUp({
-    @required String id,
-    @required String judul,
-    @required String pengarang,
-    @required String penerbit,
-    @required String tahun,
+    required String? id,
+    required String? judul,
+    required String? pengarang,
+    required String? penerbit,
+    required String? tahun,
   }) async {
     await Future.delayed(Duration(milliseconds: 250));
     return showDialog(
@@ -137,7 +137,7 @@ class _BooksState extends State<Books> {
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final data = snapshot.data[index];
+                      final data = snapshot.data![index];
                       return Padding(
                         padding: EdgeInsets.all(7),
                         child: CardBook(
@@ -146,7 +146,7 @@ class _BooksState extends State<Books> {
                           pengarang: data.pengarang,
                           penerbit: data.penerbit,
                           tahun: data.tahun,
-                          jumlah: int.parse(data.jumlah),
+                          jumlah: int.parse(data.jumlah!),
                           onTap: () {
                             popUp(
                               id: data.id,
@@ -159,7 +159,7 @@ class _BooksState extends State<Books> {
                         ),
                       );
                     },
-                    childCount: snapshot.data.length,
+                    childCount: snapshot.data!.length,
                   ),
                 );
               }
@@ -173,68 +173,68 @@ class _BooksState extends State<Books> {
           ),
         ],
       ),
-      drawer: Drawer(
-        child: Column(
-          children: [
-            Flexible(
-              flex: 5,
-              child: Stack(
-                children: [
-                  Container(
-                    padding: EdgeInsets.fromLTRB(20, 32, 20, 0),
-                    width: MediaQuery.of(context).size.width,
-                    //color: Colors.deepPurple,
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                          image: AssetImage("images/Bg_Login.png"),
-                          fit: BoxFit.fill),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 20,
-                    left: 10,
-                    child: Text(
-                      "KATEGORI BUKU",
-                      style: TextStyle(
-                        fontFamily: "Montserrat",
-                        fontSize: 20,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            Flexible(
-              flex: 11,
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                color: Colors.orange[300],
-                child: ListView(
-                  padding: EdgeInsets.only(top: 20, bottom: 90),
-                  children: [
-                    kategoriDrawer(caption: "Komputer"),
-                    kategoriDrawer(caption: "Novel"),
-                    kategoriDrawer(caption: "Biografi"),
-                    kategoriDrawer(caption: "Jurnal"),
-                    kategoriDrawer(caption: "Fiksi"),
-                    kategoriDrawer(caption: "Buku Anak"),
-                    kategoriDrawer(caption: "Ekonomi"),
-                    kategoriDrawer(caption: "Keuangan"),
-                    kategoriDrawer(caption: "Kesehatan"),
-                    kategoriDrawer(caption: "Sains"),
-                    kategoriDrawer(caption: "Agama"),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
+      // drawer: Drawer(
+      //   child: Column(
+      //     children: [
+      //       Flexible(
+      //         flex: 5,
+      //         child: Stack(
+      //           children: [
+      //             Container(
+      //               padding: EdgeInsets.fromLTRB(20, 32, 20, 0),
+      //               width: MediaQuery.of(context).size.width,
+      //               //color: Colors.deepPurple,
+      //               decoration: BoxDecoration(
+      //                 image: DecorationImage(
+      //                     image: AssetImage("images/Bg_Login.png"),
+      //                     fit: BoxFit.fill),
+      //               ),
+      //             ),
+      //             Positioned(
+      //               bottom: 20,
+      //               left: 10,
+      //               child: Text(
+      //                 "KATEGORI BUKU",
+      //                 style: TextStyle(
+      //                   fontFamily: "Montserrat",
+      //                   fontSize: 20,
+      //                   color: Colors.white,
+      //                 ),
+      //               ),
+      //             ),
+      //           ],
+      //         ),
+      //       ),
+      //       Flexible(
+      //         flex: 11,
+      //         child: Container(
+      //           width: MediaQuery.of(context).size.width,
+      //           color: Colors.orange[300],
+      //           child: ListView(
+      //             padding: EdgeInsets.only(top: 20, bottom: 90),
+      //             children: [
+      //               kategoriDrawer(caption: "Komputer"),
+      //               kategoriDrawer(caption: "Novel"),
+      //               kategoriDrawer(caption: "Biografi"),
+      //               kategoriDrawer(caption: "Jurnal"),
+      //               kategoriDrawer(caption: "Fiksi"),
+      //               kategoriDrawer(caption: "Buku Anak"),
+      //               kategoriDrawer(caption: "Ekonomi"),
+      //               kategoriDrawer(caption: "Keuangan"),
+      //               kategoriDrawer(caption: "Kesehatan"),
+      //               kategoriDrawer(caption: "Sains"),
+      //               kategoriDrawer(caption: "Agama"),
+      //             ],
+      //           ),
+      //         ),
+      //       ),
+      //     ],
+      //   ),
+      // ),
     );
   }
 
-  Material kategoriDrawer({@required String caption, Function onTap}) {
+  Material kategoriDrawer({required String caption, Function? onTap}) {
     return Material(
       color: Colors.transparent,
       child: InkWell(
@@ -262,11 +262,11 @@ class _BooksState extends State<Books> {
 
   Dialog dialogMenu(
     BuildContext context, {
-    @required String id,
-    @required String judul,
-    @required String pengarang,
-    @required String penerbit,
-    @required String tahun,
+    required String? id,
+    required String? judul,
+    required String? pengarang,
+    required String? penerbit,
+    required String? tahun,
   }) {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
@@ -384,7 +384,7 @@ class _BooksState extends State<Books> {
                         print("ID BUKU = $id");
                         delBook(id: id).then((value) {
                           Navigator.pop(context);
-                          Toast.show("Buku telah dihapus", context);
+                          // Toast.show("Buku telah dihapus", context);
                         },
                         );
                       },

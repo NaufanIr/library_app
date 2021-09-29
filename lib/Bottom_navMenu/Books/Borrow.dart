@@ -1,6 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:intl/intl.dart';
 import 'package:library_app/Bottom_navMenu/Books/PdfApi.dart';
 import 'package:library_app/Models/BooksData.dart';
@@ -9,18 +10,17 @@ import 'package:library_app/Widgets/CardBook.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:library_app/Models/BorrowsData.dart';
-import 'package:toast/toast.dart';
+//import 'package:toast/toast.dart';
 
 class Borrow extends StatefulWidget {
-  final String idBuku;
+  final String? idBuku;
 
-  Borrow({@required this.idBuku});
+  Borrow({required this.idBuku});
 
   @override
   _BorrowState createState() => _BorrowState();
 }
 
-//Hal4Mad1d
 class _BorrowState extends State<Borrow> {
 //Text Editing Controller
   TextEditingController idAnggota = TextEditingController();
@@ -31,7 +31,8 @@ class _BorrowState extends State<Borrow> {
   var judul;
 
 //ID Generete
-  String idGenerator({int durasi, String tgl, String idAnggota}) {
+  String? idGenerator(
+      {int? durasi, required String tgl, required String idAnggota}) {
     String date =
         tgl.substring(2, 4) + tgl.substring(5, 7) + tgl.substring(8, 10);
     String idMbr = idAnggota.substring(5, 8);
@@ -46,14 +47,14 @@ class _BorrowState extends State<Borrow> {
 
 //Set Tanggal --Form
   DateTime _today = DateTime.now();
-  DateTime _selectedDate;
+  DateTime? _selectedDate;
   _selectDate(BuildContext context) async {
-    DateTime newSelectedDate = await showDatePicker(
+    DateTime? newSelectedDate = await showDatePicker(
       context: context,
-      initialDate: _selectedDate != null ? _selectedDate : DateTime.now(),
+      initialDate: _selectedDate != null ? _selectedDate! : DateTime.now(),
       firstDate: DateTime(2000),
       lastDate: DateTime(2040),
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return Theme(
           data: ThemeData.dark().copyWith(
             colorScheme: ColorScheme.dark(
@@ -64,24 +65,28 @@ class _BorrowState extends State<Borrow> {
             ),
             dialogBackgroundColor: Color(0xff5C549A),
           ),
-          child: child,
+          child: child!,
         );
       },
     );
     if (newSelectedDate != null) {
       _selectedDate = newSelectedDate;
-      tanggal..text = DateFormat("yyyy-MM-dd").format(_selectedDate);
+      tanggal..text = DateFormat("yyyy-MM-dd").format(_selectedDate!);
     }
   }
 
 //Tgl Kembali --Dialog
-  String returnDate({int year, int month, int day, int durasi}) {
+  String returnDate(
+      {required int year,
+      required int month,
+      required int day,
+      required int durasi}) {
     var date = DateTime(year, month, day).add(Duration(days: durasi));
     return DateFormat("d MMMM yyyy").format(date).toString();
   }
 
 //Drop Down Durasi Pinjam --Form
-  int durasi;
+  int? durasi;
   final List<int> durasiItem = [0, 7, 14, 30];
 
 //Kartu Cetak
@@ -124,7 +129,7 @@ class _BorrowState extends State<Borrow> {
               ),
             );
           } else {
-            final data = snapshot.data[0];
+            final data = snapshot.data![0];
             return SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(5, 10, 5, 30),
@@ -212,15 +217,15 @@ class _BorrowState extends State<Borrow> {
                                 suggestion = fetchMembers().then((val) {
                                   return val
                                       .where((element) =>
-                                          element.nama
+                                          element.nama!
                                               .toLowerCase()
                                               .contains(query) ||
-                                          element.id.startsWith(query))
+                                          element.id!.startsWith(query))
                                       .toList();
                                 });
                                 return suggestion;
                               },
-                              itemBuilder: (context, suggestion) {
+                              itemBuilder: (context, dynamic suggestion) {
                                 final members = suggestion;
                                 return ListTile(
                                   title: Text(
@@ -241,7 +246,7 @@ class _BorrowState extends State<Borrow> {
                                   ),
                                 );
                               },
-                              onSuggestionSelected: (suggestion) {
+                              onSuggestionSelected: (dynamic suggestion) {
                                 idAnggota.text = suggestion.id;
                               },
                             ),
@@ -325,7 +330,7 @@ class _BorrowState extends State<Borrow> {
                               ),
                               value: this.durasi,
                               items: this.durasiItem.map((e) {
-                                String kalimat(int e) {
+                                String? kalimat(int e) {
                                   if (e == 0) {
                                     return "Durasi Pinjam";
                                   } else if (e == 7) {
@@ -342,7 +347,7 @@ class _BorrowState extends State<Borrow> {
                                   child: Text("${kalimat(e)}"),
                                 );
                               }).toList(),
-                              onChanged: (val) {
+                              onChanged: (dynamic val) {
                                 setState(
                                   () {
                                     durasi = val;
@@ -374,13 +379,21 @@ class _BorrowState extends State<Borrow> {
                             this.tanggal.text.isEmpty ||
                             this.durasi == null ||
                             this.durasi == 0) {
-                          Toast.show(
-                            "Data tidak valid",
-                            context,
-                            duration: 1,
-                            backgroundColor:
-                                Colors.redAccent.shade700.withOpacity(0.7),
-                            gravity: Toast.CENTER,
+                          Get.rawSnackbar(
+                            messageText: Text(
+                              "Data tidak valid",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                fontSize: 13,
+                                color: Colors.white,
+                              ),
+                            ),
+                            backgroundColor: Colors.redAccent,
+                            padding: EdgeInsets.symmetric(
+                              vertical: 12,
+                              horizontal: 10,
+                            ),
+                            borderRadius: 5,
                           );
                         } else {
                           idGenerator(
@@ -395,16 +408,55 @@ class _BorrowState extends State<Borrow> {
                             tanggal: this.tanggal.text,
                             durasi: this.durasi.toString(),
                           ).then((value) {
-                            print(value);
                             kartuPinjam();
-                            Toast.show(
-                              "Data peminjaman buku berhasil ditambahkan",
-                              context,
-                              duration: 4,
-                              backgroundColor: Colors.blueAccent,
-                              gravity: Toast.BOTTOM,
+                            Get.rawSnackbar(
+                              messageText: Text(
+                                "Data peminjaman buku berhasil ditambahkan",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              backgroundColor:
+                              Colors.blueAccent.withOpacity(0.93),
+                              dismissDirection:
+                              SnackDismissDirection.HORIZONTAL,
+                              margin: EdgeInsets.symmetric(
+                                vertical: 80,
+                                horizontal: 15,
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                vertical: 12,
+                                horizontal: 10,
+                              ),
+                              borderRadius: 5,
                             );
                           });
+                          // kartuPinjam();
+                          // Get.rawSnackbar(
+                          //   messageText: Text(
+                          //     "Data peminjaman buku berhasil ditambahkan",
+                          //     textAlign: TextAlign.center,
+                          //     style: TextStyle(
+                          //       fontSize: 13,
+                          //       color: Colors.white,
+                          //     ),
+                          //   ),
+                          //   backgroundColor:
+                          //   Colors.blueAccent.withOpacity(0.93),
+                          //   dismissDirection:
+                          //   SnackDismissDirection.HORIZONTAL,
+                          //   margin: EdgeInsets.symmetric(
+                          //     vertical: 80,
+                          //     horizontal: 15,
+                          //   ),
+                          //   padding: EdgeInsets.symmetric(
+                          //     vertical: 12,
+                          //     horizontal: 10,
+                          //   ),
+                          //   borderRadius: 5,
+                          // );
                         }
                       },
                     ),
@@ -452,7 +504,7 @@ class _BorrowState extends State<Borrow> {
     var bulan = int.parse(tanggal.text.toString().substring(5, 7));
     var hari = int.parse(tanggal.text.toString().substring(8, 10));
     var tglKembali =
-        returnDate(year: tahun, month: bulan, day: hari, durasi: this.durasi);
+        returnDate(year: tahun, month: bulan, day: hari, durasi: this.durasi!);
 
     return Dialog(
       backgroundColor: Colors.transparent,

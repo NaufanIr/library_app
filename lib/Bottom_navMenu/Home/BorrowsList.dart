@@ -93,14 +93,14 @@ class _BorrowsListState extends State<BorrowsList> {
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      final data = snapshot.data[index];
+                      final data = snapshot.data![index];
                       var tahun = int.parse(
-                          data.tanggal.substring(0, 4));
+                          data.tanggal!.substring(0, 4));
                       var bulan = int.parse(
-                          data.tanggal.substring(5, 7));
+                          data.tanggal!.substring(5, 7));
                       var hari = int.parse(
-                          data.tanggal.substring(8, 10));
-                      var duration = int.parse(data.durasi);
+                          data.tanggal!.substring(8, 10));
+                      var duration = int.parse(data.durasi!);
                       return Padding(
                         padding: EdgeInsets.all(7),
                         child: CardBorrow(
@@ -130,7 +130,7 @@ class _BorrowsListState extends State<BorrowsList> {
                         ),
                       );
                     },
-                    childCount: snapshot.data.length,
+                    childCount: snapshot.data!.length,
                   ),
                 );
               }

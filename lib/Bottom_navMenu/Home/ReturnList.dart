@@ -60,7 +60,7 @@ class ReturnList extends StatelessWidget {
                 return SliverList(
                   delegate: SliverChildBuilderDelegate(
                     (context, index) {
-                      var data = snapshot.data[index];
+                      var data = snapshot.data![index];
                       return Padding(
                         padding: EdgeInsets.symmetric(horizontal: 7, vertical: 8),
                         child: CardReturn(
@@ -87,7 +87,7 @@ class ReturnList extends StatelessWidget {
                         ),
                       );
                     },
-                    childCount: snapshot.data.length,
+                    childCount: snapshot.data!.length,
                   ),
                 );
               }
@@ -106,16 +106,16 @@ class ReturnList extends StatelessWidget {
   }
 
   Future popUp({
-    @required BuildContext context,
-    @required String id,
-    @required String idPeminjaman,
-    @required String tanggal,
-    @required String denda,
-    @required String keterangan,
-    @required String nama,
-    @required String judul,
-    @required String tglPinjam,
-    @required String durasi,
+    required BuildContext context,
+    required String? id,
+    required String? idPeminjaman,
+    required String? tanggal,
+    required String? denda,
+    required String? keterangan,
+    required String? nama,
+    required String? judul,
+    required String? tglPinjam,
+    required String? durasi,
   }) async {
     await Future.delayed(Duration(milliseconds: 250));
     return showDialog(
@@ -182,7 +182,7 @@ class ReturnList extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              id,
+                              id!,
                               style: TextStyle(
                                 fontSize: fontSize,
                                 color: Color(0xff5C549A),
@@ -204,7 +204,7 @@ class ReturnList extends StatelessWidget {
                             ),
                             Expanded(
                               child: Text(
-                                nama,
+                                nama!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(
@@ -229,7 +229,7 @@ class ReturnList extends StatelessWidget {
                             ),
                             Expanded(
                               child: Text(
-                                judul,
+                                judul!,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                                 style: TextStyle(

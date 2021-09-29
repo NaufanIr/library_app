@@ -4,21 +4,21 @@ import 'package:intl/intl.dart';
 
 class CardReturn extends StatelessWidget {
 
-  final String id, idPinjam, nama, tanggal, denda, buku;
-  final Function onTap;
+  final String? id, idPinjam, nama, tanggal, denda, buku;
+  final Function? onTap;
 
   CardReturn({
-    @required this.id,
-    @required this.idPinjam,
-    @required this.nama,
-    @required this.tanggal,
-    @required this.denda,
-    @required this.buku,
+    required this.id,
+    required this.idPinjam,
+    required this.nama,
+    required this.tanggal,
+    required this.denda,
+    required this.buku,
     this.onTap,
   });
 
 
-  static String tanggalGenerator({String tgl}){
+  static String tanggalGenerator({String? tgl}){
     var tahun = int.parse(tgl.toString().substring(0, 4));
     var bulan = int.parse(tgl.toString().substring(5, 7));
     var hari = int.parse(tgl.toString().substring(8, 10));
@@ -26,7 +26,7 @@ class CardReturn extends StatelessWidget {
     return DateFormat("d MMMM yyyy").format(date).toString();
   }
 
-  static String dendaGenerator(String val){
+  static String dendaGenerator(String? val){
     var denda = val == null ? 0 : int.parse(val);
     return NumberFormat.currency(
       locale: 'id',
@@ -135,7 +135,7 @@ class CardReturn extends StatelessWidget {
                           ),
                         ),
                         Expanded(
-                          child: Text(this.nama,
+                          child: Text(this.nama!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -160,7 +160,7 @@ class CardReturn extends StatelessWidget {
                         ),
                         Expanded(
                           child: Text(
-                            this.buku,
+                            this.buku!,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                             style: TextStyle(
@@ -231,7 +231,7 @@ class CardReturn extends StatelessWidget {
               ),
             ],
           ),
-          onTap: onTap,
+          onTap: onTap as void Function()?,
         ),
       ),
     );

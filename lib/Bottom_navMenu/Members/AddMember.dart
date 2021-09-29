@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:library_app/Models/MembersData.dart';
 import 'package:lottie/lottie.dart';
-import 'package:toast/toast.dart';
+//import 'package:toast/toast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddMember extends StatefulWidget {
@@ -30,7 +31,7 @@ class _AddMemberState extends State<AddMember> {
     });
   }
 
-  String idGenerator({String kelas, String thnAngkatan, String idCounter}) {
+  String idGenerator({required String kelas, String? thnAngkatan, String? idCounter}) {
     String kdJur = kelas.substring(2, 5);
     String id;
     if (kdJur == "IPA") {
@@ -52,7 +53,7 @@ class _AddMemberState extends State<AddMember> {
     _selectedGender = null;
   }
 
-  String _selectedGender;
+  String? _selectedGender;
   final List<String> genderList = [
     "Laki-laki",
     "Perempuan",
@@ -180,7 +181,7 @@ class _AddMemberState extends State<AddMember> {
                                 value: val, child: Text(val));
                           },
                         ).toList(),
-                        onChanged: (val) {
+                        onChanged: (dynamic val) {
                           setState(
                             () {
                               _selectedGender = val;
@@ -224,16 +225,24 @@ class _AddMemberState extends State<AddMember> {
                       thnAngkatan.text.isEmpty ||
                       alamat.text.isEmpty ||
                       _selectedGender == null) {
-                    Toast.show(
-                      "Semua data wajib diisi",
-                      context,
-                      duration: 2,
-                      backgroundColor:
-                          Colors.redAccent.shade700.withOpacity(0.7),
-                      gravity: Toast.CENTER,
+                    Get.rawSnackbar(
+                      messageText: Text(
+                        "Semua data wajib diisi",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: Colors.white,
+                        ),
+                      ),
+                      backgroundColor: Colors.redAccent,
+                      padding: EdgeInsets.symmetric(
+                        vertical: 12,
+                        horizontal: 10,
+                      ),
+                      borderRadius: 5,
                     );
                   } else {
-                    String gender = _selectedGender.substring(0, 1);
+                    String gender = _selectedGender!.substring(0, 1);
                     addMember(
                       id: idGenerator(
                           kelas: kelas.text,
@@ -248,12 +257,21 @@ class _AddMemberState extends State<AddMember> {
                       idCounter++;
                       setPref();
                       clear();
-                      Toast.show(
-                        "Anggota berhasil ditambahkan",
-                        context,
-                        duration: 3,
+                      Get.rawSnackbar(
+                        messageText: Text(
+                          "Anggota berhasil ditambahkan",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white,
+                          ),
+                        ),
                         backgroundColor: Colors.blueAccent,
-                        gravity: Toast.BOTTOM,
+                        padding: EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 10,
+                        ),
+                        borderRadius: 5,
                       );
                     });
                   }

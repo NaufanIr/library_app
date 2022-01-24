@@ -2,29 +2,27 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:get/get.dart';
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-import 'package:library_app/API.dart';
 import 'package:library_app/Bottom_navMenu/Home/BookReturn.dart';
 import 'package:library_app/Bottom_navMenu/Home/BorrowsList.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter_barcode_scanner/flutter_barcode_scanner.dart';
+import 'package:library_app/Bottom_navMenu/Home/Employee.dart';
 import 'package:library_app/Login.dart';
 import 'package:library_app/Models/BooksData.dart';
 import 'package:library_app/Models/BorrowsData.dart';
 import 'package:library_app/Models/MembersData.dart';
 import 'package:library_app/Widgets/CardBorrow.dart';
-//import 'package:toast/toast.dart';
 import 'ReturnList.dart';
 
-class Home extends StatefulWidget {
-  @override
-  _HomeState createState() => _HomeState();
-}
+class Home extends StatelessWidget {
+  late final id, nama, jabatan;
+  Home({String? id, String? nama, String? jabatan}) {
+    this.id = id;
+    this.nama = nama;
+    this.jabatan = jabatan;
+  }
 
-class _HomeState extends State<Home> {
-
-  int _currentIndex = 0;
+  var _currentIndex = 0.obs;
   List<T> dotIndex<T>(Function handler) {
     List<T> dots = [];
     for (var i = 0; i < 5; i++) {
@@ -37,60 +35,52 @@ class _HomeState extends State<Home> {
   String qrData = "";
   Future scanQRCode() async {
     qrData = await FlutterBarcodeScanner.scanBarcode(
-        "#ff6A639F", "Cancel", true, ScanMode.QR);
-    fetchBorrowById(id: qrData).then((data) {
-      if(data.length == 0){
-        print(data.length);
-        Get.rawSnackbar(
-          messageText: Text(
-            "Data tidak ditemukan",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 13,
-              color: Colors.white,
-            ),
-          ),
-          snackPosition: SnackPosition.TOP,
-          dismissDirection: SnackDismissDirection.HORIZONTAL,
-          backgroundColor: Colors.redAccent.withOpacity(0.93),
-          margin: EdgeInsets.symmetric(
-            vertical: 54,
-            horizontal: 8,
-          ),
-          padding: EdgeInsets.symmetric(
-            vertical: 20,
-            horizontal: 10,
-          ),
-          borderRadius: 12,
-        );
-      }else{
-        var id = data[0].id;
-        var tanggal = data[0].tanggal;
-        var durasi = data[0].durasi;
-        var tahun = int.parse(tanggal.toString().substring(0, 4));
-        var bulan = int.parse(tanggal.toString().substring(5, 7));
-        var hari = int.parse(tanggal.toString().substring(8, 10));
-        var duration = int.parse(durasi.toString().substring(0, 2));
-        int denda = CardBorrow.returnCountDown(
-            year: tahun, month: bulan, day: hari, durasi: duration);
-        setState(
-              () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) {
-                  return bookReturn(id: id, denda: denda,);
-                },
+        "#ff6A639F", "Cancel", false, ScanMode.QR);
+    fetchBorrowById(id: qrData).then(
+      (data) {
+        if (data.length == 0 || data[0].exist == "0") {
+          print(data.length);
+          Get.rawSnackbar(
+            messageText: Text(
+              "Data tidak ditemukan",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 13,
+                color: Colors.white,
               ),
-            );
-          },
-        );
-      }
-    });
+            ),
+            snackPosition: SnackPosition.TOP,
+            dismissDirection: SnackDismissDirection.HORIZONTAL,
+            backgroundColor: Colors.redAccent.withOpacity(0.93),
+            margin: EdgeInsets.symmetric(
+              vertical: 54,
+              horizontal: 8,
+            ),
+            padding: EdgeInsets.symmetric(
+              vertical: 20,
+              horizontal: 10,
+            ),
+            borderRadius: 12,
+          );
+        } else {
+          var id = data[0].id;
+          Get.toNamed('${BookReturn.TAG}/$id');
+          // var tanggal = data[0].tanggal;
+          // var durasi = data[0].durasi;
+          // var tahun = int.parse(tanggal.toString().substring(0, 4));
+          // var bulan = int.parse(tanggal.toString().substring(5, 7));
+          // var hari = int.parse(tanggal.toString().substring(8, 10));
+          // var duration = int.parse(durasi.toString().substring(0, 2));
+          // int denda = CardBorrow.returnCountDown(
+          //     year: tahun, month: bulan, day: hari, durasi: duration);
+          //Get.to(() => BookReturn(id: id, denda: denda));
+        }
+      },
+    );
   }
 
-  @override
   Widget build(BuildContext context) {
+    print("=======REFRESH========");
     return Scaffold(
       backgroundColor: Color(0x1f5C549A),
       appBar: PreferredSize(
@@ -106,20 +96,20 @@ class _HomeState extends State<Home> {
             ),
           ),
           backgroundColor: Color(0xff5C549A),
-          // actions: [
-          //   Center(
-          //     child: Container(
-          //       margin: EdgeInsets.only(right: 12),
-          //       child: Text(
-          //         "Naufan Ir - Staff",
-          //         style: TextStyle(
-          //             fontFamily: "Montserrat",
-          //             fontSize: 13,
-          //             color: Colors.white),
-          //       ),
-          //     ),
-          //   ),
-          // ],
+          actions: [
+            Center(
+              child: Container(
+                margin: EdgeInsets.only(right: 12),
+                child: Text(
+                  "${Get.parameters['nama']} - ${Get.parameters['jabatan']}",
+                  style: TextStyle(
+                      fontFamily: "Montserrat",
+                      fontSize: 13,
+                      color: Colors.white),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
       body: CustomScrollView(
@@ -227,21 +217,19 @@ class _HomeState extends State<Home> {
                               autoPlay: true,
                               pageSnapping: true,
                               onPageChanged: (index, reason) {
-                                setState(() {
-                                  _currentIndex = index;
-                                });
+                                _currentIndex.value = index;
                               },
                             ),
                             itemCount: 5,
                             itemBuilder: (BuildContext context, int index, _) {
                               final data = snapshot.data![index];
-                              var tahun = int.parse(
-                                  data.tanggal!.substring(0, 4));
-                              var bulan = int.parse(
-                                  data.tanggal!.substring(5, 7));
-                              var hari = int.parse(
-                                  data.tanggal!.substring(8, 10));
-                              var duration = int.parse(data.durasi!);
+                              // var tahun =
+                              //     int.parse(data.tanggal!.substring(0, 4));
+                              // var bulan =
+                              //     int.parse(data.tanggal!.substring(5, 7));
+                              // var hari =
+                              //     int.parse(data.tanggal!.substring(8, 10));
+                              // var duration = int.parse(data.durasi!);
                               return Padding(
                                 padding: EdgeInsets.symmetric(
                                   horizontal: 4,
@@ -254,28 +242,16 @@ class _HomeState extends State<Home> {
                                   tanggal: data.tanggal,
                                   durasi: data.durasi,
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) {
-                                          bool denda = CardBorrow.returnCountDown(
-                                            year: tahun,
-                                            month: bulan,
-                                            day: hari,
-                                            durasi: duration,
-                                          ).isNegative;
-                                          return bookReturn(
-                                            id: data.id,
-                                            denda: CardBorrow.returnCountDown(
-                                              year: tahun,
-                                              month: bulan,
-                                              day: hari,
-                                              durasi: duration,
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    );
+                                    print("ID = ${data.id}");
+                                    print('${BookReturn.TAG}/${data.id}');
+                                    // int denda = CardBorrow.returnCountDown(
+                                    //   year: tahun,
+                                    //   month: bulan,
+                                    //   day: hari,
+                                    //   durasi: duration,
+                                    // );
+
+                                    Get.toNamed('${BookReturn.TAG}/${data.id}');
                                   },
                                 ),
                               );
@@ -287,31 +263,35 @@ class _HomeState extends State<Home> {
                     SizedBox(height: 5),
 
                     //DOT INDICATOR
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: dotIndex<Widget>((index) {
-                        if (_currentIndex == index) {
-                          return Container(
-                            width: 15,
-                            height: 4,
-                            margin: EdgeInsets.symmetric(horizontal: 5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10),
-                              color: Colors.orange[300],
-                            ),
-                          );
-                        } else {
-                          return Container(
-                            width: 4,
-                            height: 4,
-                            margin: EdgeInsets.symmetric(horizontal: 5),
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: Colors.white54,
-                            ),
-                          );
-                        }
-                      })
+                    Obx(
+                      () => Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: dotIndex<Widget>(
+                          (index) {
+                            if (_currentIndex.value == index) {
+                              return Container(
+                                width: 15,
+                                height: 4,
+                                margin: EdgeInsets.symmetric(horizontal: 5),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color: Colors.orange[300],
+                                ),
+                              );
+                            } else {
+                              return Container(
+                                width: 4,
+                                height: 4,
+                                margin: EdgeInsets.symmetric(horizontal: 5),
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: Colors.white54,
+                                ),
+                              );
+                            }
+                          },
+                        ),
+                      ),
                     ),
                   ],
                 ),
@@ -546,21 +526,18 @@ class _HomeState extends State<Home> {
                     //   caption: "EDIT PASSWORD",
                     //   onTap: () {},
                     // ),
-                    // menuDrawer(
-                    //   caption: "PEGAWAI",
-                    //   onTap: () {},
-                    // ),
                     menuDrawer(
                       caption: "DAFTAR PENGEMBALIAN BUKU",
                       onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) {
-                              return ReturnList();
-                            },
-                          ),
-                        );
+                        Get.back();
+                        Get.toNamed(ReturnList.TAG);
+                      },
+                    ),
+                    menuDrawer(
+                      caption: "DAFTAR PEGAWAI",
+                      onTap: () {
+                        Get.back();
+                        Get.toNamed(Employee.TAG);
                       },
                     ),
                     SizedBox(
@@ -581,12 +558,7 @@ class _HomeState extends State<Home> {
                         borderRadius: BorderRadius.circular(20),
                       ),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => Login(),
-                          ),
-                        );
+                        Get.offNamed(Login.TAG);
                       },
                     ),
                   ],
@@ -599,41 +571,11 @@ class _HomeState extends State<Home> {
     );
   }
 
-  Material menuDrawer({required String caption, Function? onTap}) {
-    return Material(
-      color: Colors.transparent,
-      child: InkWell(
-        splashColor: Colors.blue[500],
-        onTap: onTap as void Function()?,
-        child: Container(
-          padding: EdgeInsets.only(top: 30, bottom: 30),
-          decoration: BoxDecoration(
-            border: Border(
-              bottom: BorderSide(color: Colors.grey),
-            ),
-          ),
-          child: Center(
-            child: Text(
-              "$caption",
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                fontFamily: "Montserrat",
-                fontSize: 13,
-                color: Colors.black54,
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
   Container infoCard({
     required BuildContext context,
     required String pict,
     required String caption,
     required int? total,
-    //@required Color bgColor,
   }) {
     return Container(
       margin: EdgeInsets.only(top: 15),
@@ -673,6 +615,35 @@ class _HomeState extends State<Home> {
               ), //Colors.blue[700])),
             ),
           ],
+        ),
+      ),
+    );
+  }
+
+  Material menuDrawer({required String caption, Function? onTap}) {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        splashColor: Colors.blue[500],
+        onTap: onTap as void Function()?,
+        child: Container(
+          padding: EdgeInsets.only(top: 30, bottom: 30),
+          decoration: BoxDecoration(
+            border: Border(
+              bottom: BorderSide(color: Colors.grey),
+            ),
+          ),
+          child: Center(
+            child: Text(
+              "$caption",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontFamily: "Montserrat",
+                fontSize: 13,
+                color: Colors.black54,
+              ),
+            ),
+          ),
         ),
       ),
     );

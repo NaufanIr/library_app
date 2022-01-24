@@ -7,6 +7,7 @@ class API{
   static var showBuku = "${url}getBuku.php";
   static var showBukuById = "${url}getBukuById.php";
   static var showAnggota = "${url}getAnggota.php";
+  static var showPetugas = "${url}getPetugas.php";
   static var showAnggotaById = "${url}getAnggotaById.php";
   static var showPeminjaman = "${url}getPeminjaman.php";
   static var showPeminjamanByID = "${url}getPeminjamanById.php";

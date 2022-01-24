@@ -1,21 +1,33 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:flutter/rendering.dart';
+import 'package:get/get.dart';
 import 'package:library_app/Bottom_navMenu/Books/AddBook.dart';
 import 'package:library_app/Bottom_navMenu/Books/Borrow.dart';
 import 'package:library_app/Bottom_navMenu/Books/UpdateBook.dart';
 import 'package:library_app/Models/BooksData.dart';
 import 'package:library_app/Search.dart';
 import 'package:library_app/Widgets/CardBook.dart';
-//import 'package:toast/toast.dart';
 
-class Books extends StatefulWidget {
-  @override
-  _BooksState createState() => _BooksState();
-}
+class Books extends StatelessWidget {
+  var pinned = true.obs;
+  var scrollController = ScrollController();
+  void scrollDetection() {
+    scrollController = ScrollController()
+      ..addListener(
+        () {
+          scrollController.position.userScrollDirection ==
+                  ScrollDirection.forward
+              ? pinned.value = true
+              : pinned.value = false;
+        },
+      );
+  }
 
-class _BooksState extends State<Books> {
   Future popUp({
+    required BuildContext context,
     required String? id,
     required String? judul,
     required String? pengarang,
@@ -54,16 +66,19 @@ class _BooksState extends State<Books> {
 
   @override
   Widget build(BuildContext context) {
+    print("=== $pinned ===");
+    scrollDetection();
     return Scaffold(
       backgroundColor: Color(0x1f5C549A),
       body: CustomScrollView(
+        controller: scrollController,
         slivers: [
           //APPBAR
           SliverAppBar(
+            pinned: true,
             toolbarHeight: 50,
             expandedHeight: MediaQuery.of(context).size.height / 3.8,
             backgroundColor: Color(0xff5C549A),
-            pinned: true,
             flexibleSpace: FlexibleSpaceBar(
               titlePadding: EdgeInsets.only(left: 60.0, bottom: 13),
               title: Text(
@@ -110,9 +125,16 @@ class _BooksState extends State<Books> {
             ],
           ),
 
-          //MARGIN TO APPBAR
+          Obx(
+            () => SliverPersistentHeader(
+                //floating: pinned.value,
+                pinned: pinned.value,
+                delegate: SearchBar(),
+              ),
+          ),
+
           SliverToBoxAdapter(
-            child: Container(margin: EdgeInsets.only(bottom: 5, top: 5)),
+            child: Container(margin: EdgeInsets.only(top: 5)),
           ),
 
           //CARD BUKU
@@ -149,6 +171,7 @@ class _BooksState extends State<Books> {
                           jumlah: int.parse(data.jumlah!),
                           onTap: () {
                             popUp(
+                              context: context,
                               id: data.id,
                               judul: data.judul,
                               pengarang: data.pengarang,
@@ -173,64 +196,64 @@ class _BooksState extends State<Books> {
           ),
         ],
       ),
-      // drawer: Drawer(
-      //   child: Column(
-      //     children: [
-      //       Flexible(
-      //         flex: 5,
-      //         child: Stack(
-      //           children: [
-      //             Container(
-      //               padding: EdgeInsets.fromLTRB(20, 32, 20, 0),
-      //               width: MediaQuery.of(context).size.width,
-      //               //color: Colors.deepPurple,
-      //               decoration: BoxDecoration(
-      //                 image: DecorationImage(
-      //                     image: AssetImage("images/Bg_Login.png"),
-      //                     fit: BoxFit.fill),
-      //               ),
-      //             ),
-      //             Positioned(
-      //               bottom: 20,
-      //               left: 10,
-      //               child: Text(
-      //                 "KATEGORI BUKU",
-      //                 style: TextStyle(
-      //                   fontFamily: "Montserrat",
-      //                   fontSize: 20,
-      //                   color: Colors.white,
-      //                 ),
-      //               ),
-      //             ),
-      //           ],
-      //         ),
-      //       ),
-      //       Flexible(
-      //         flex: 11,
-      //         child: Container(
-      //           width: MediaQuery.of(context).size.width,
-      //           color: Colors.orange[300],
-      //           child: ListView(
-      //             padding: EdgeInsets.only(top: 20, bottom: 90),
-      //             children: [
-      //               kategoriDrawer(caption: "Komputer"),
-      //               kategoriDrawer(caption: "Novel"),
-      //               kategoriDrawer(caption: "Biografi"),
-      //               kategoriDrawer(caption: "Jurnal"),
-      //               kategoriDrawer(caption: "Fiksi"),
-      //               kategoriDrawer(caption: "Buku Anak"),
-      //               kategoriDrawer(caption: "Ekonomi"),
-      //               kategoriDrawer(caption: "Keuangan"),
-      //               kategoriDrawer(caption: "Kesehatan"),
-      //               kategoriDrawer(caption: "Sains"),
-      //               kategoriDrawer(caption: "Agama"),
-      //             ],
-      //           ),
-      //         ),
-      //       ),
-      //     ],
-      //   ),
-      // ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            Flexible(
+              flex: 13,
+              child: Stack(
+                children: [
+                  Container(
+                    padding: EdgeInsets.fromLTRB(20, 32, 20, 0),
+                    width: MediaQuery.of(context).size.width,
+                    //color: Colors.deepPurple,
+                    decoration: BoxDecoration(
+                      image: DecorationImage(
+                          image: AssetImage("images/Bg_Login.png"),
+                          fit: BoxFit.fill),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 20,
+                    left: 10,
+                    child: Text(
+                      "KATEGORI BUKU",
+                      style: TextStyle(
+                        fontFamily: "Montserrat",
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Flexible(
+              flex: 30,
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                color: Colors.orange[300],
+                child: ListView(
+                  padding: EdgeInsets.only(top: 20, bottom: 90),
+                  children: [
+                    kategoriDrawer(caption: "Komputer"),
+                    kategoriDrawer(caption: "Novel"),
+                    kategoriDrawer(caption: "Biografi"),
+                    kategoriDrawer(caption: "Jurnal"),
+                    kategoriDrawer(caption: "Fiksi"),
+                    kategoriDrawer(caption: "Buku Anak"),
+                    kategoriDrawer(caption: "Ekonomi"),
+                    kategoriDrawer(caption: "Keuangan"),
+                    kategoriDrawer(caption: "Kesehatan"),
+                    kategoriDrawer(caption: "Sains"),
+                    kategoriDrawer(caption: "Agama"),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -346,11 +369,9 @@ class _BooksState extends State<Books> {
                     borderRadius: BorderRadius.circular(20),
                   ),
                   onPressed: () {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => UpdateBook(id: id)),
-                    );
+                    Get.back();
+                    Get.toNamed('${UpdateBook.TAG}/$id');
+                    // Get.off(UpdateBook(id: id));
                   },
                 ),
 
@@ -382,10 +403,11 @@ class _BooksState extends State<Books> {
                       ),
                       onTap: () {
                         print("ID BUKU = $id");
-                        delBook(id: id).then((value) {
-                          Navigator.pop(context);
-                          // Toast.show("Buku telah dihapus", context);
-                        },
+                        delBook(id: id).then(
+                          (value) {
+                            Navigator.pop(context);
+                            // Toast.show("Buku telah dihapus", context);
+                          },
                         );
                       },
                     ),
@@ -400,82 +422,54 @@ class _BooksState extends State<Books> {
   }
 }
 
-///STREAM BUILDER
-// StreamController<List> streamController = StreamController();
-// Timer timer;
-//
-// Future<List> getBooks() async {
-//   var response = await http.get("${API.showBooks}");
-//   final data = json.decode(response.body);
-//   streamController.add(data);
-// }
-//
-// @override
-// void initState() {
-//   getBooks();
-//   timer = Timer.periodic(Duration(seconds: 3), (timer) => getBooks());
-//   super.initState();
-// }
-//
-// @override
-// void dispose() {
-//   if (timer.isActive) {
-//     timer.cancel();
-//   }
-//   super.dispose();
-// }
+class SearchBar extends SliverPersistentHeaderDelegate {
+  @override
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    // TODO: implement build
+    return Container(
+      margin: EdgeInsets.only(top: 10, left: 7, right: 7),
+      decoration: BoxDecoration(
+        color: Colors.grey.withOpacity(0.9),
+        borderRadius: BorderRadius.circular(50),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 1,
+            offset: Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 10),
+        child: TextField(
+          cursorColor: Colors.black12,
+          decoration: InputDecoration(
+            border: InputBorder.none,
+            //focusColor: Colors.white,
+            hintStyle: TextStyle(fontSize: 17),
+            hintText: "Cari Buku...",
+            suffixIcon: IconButton(
+              icon: Icon(
+                Icons.search,
+                color: FocusNode().hasFocus ? Colors.white : Colors.black45,
+              ),
+              onPressed: () {},
+            ),
+          ),
+        ),
+      ),
+    );
+  }
 
-///LIST CARD BOOKS WITH STREAM BUILDER
-// StreamBuilder(
-//   stream: streamController.stream,
-//   builder: (context, snapshot) {
-//     if (snapshot.data == null) {
-//       return SliverList(
-//         delegate: SliverChildListDelegate(
-//           [
-//             Container(
-//               height: MediaQuery.of(context).size.height,
-//               width: MediaQuery.of(context).size.width,
-//               child: Center(
-//                 child: CircularProgressIndicator(),
-//               ),
-//             ),
-//           ],
-//         ),
-//       );
-//     } else {
-//       return SliverList(
-//         delegate: SliverChildBuilderDelegate(
-//           (BuildContext context, int index) {
-//             return Padding(
-//               padding: EdgeInsets.only(
-//                   left: 8, right: 8, top: 10, bottom: 5),
-//               child: CardBook(
-//                 context: context,
-//                 snapshot: snapshot,
-//                 index: index,
-//                 id: snapshot.data[index]['kd_buku'],
-//                 judul: snapshot.data[index]["judul"],
-//                 pengarang: snapshot.data[index]["pengarang"],
-//                 penerbit: snapshot.data[index]["penerbit"],
-//                 tahun: snapshot.data[index]["tahun_terbit"],
-//                 onTap: () {
-//                   popUp(
-//                     id: snapshot.data[index]["kd_buku"],
-//                     judul: snapshot.data[index]["judul"],
-//                     pengarang: snapshot.data[index]["pengarang"],
-//                     penerbit: snapshot.data[index]["penerbit"],
-//                     thn_terbit: snapshot.data[index]["tahun_terbit"],
-//                   );
-//                 },
-//               ),
-//             );
-//           },
-//           childCount: snapshot.data.length,
-//         ),
-//       );
-//     }
-//   },
-// ),
+  @override
+  // TODO: implement maxExtent
+  double get maxExtent => 50;
 
-//MARGIN TO NAVBAR
+  @override
+  // TODO: implement minExtent
+  double get minExtent => 50;
+  @override
+  bool shouldRebuild(covariant SliverPersistentHeaderDelegate oldDelegate) =>
+      false;
+}

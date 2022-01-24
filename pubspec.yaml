@@ -42,7 +42,6 @@ dependencies:
   intl : ^0.17.0
   http : ^0.13.3
   get: ^4.3.8
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -62,6 +61,7 @@ flutter:
   assets:
      - images/
      - images/book/
+     - images/persons/
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

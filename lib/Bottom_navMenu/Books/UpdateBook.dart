@@ -1,22 +1,24 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:library_app/Bottom_navMenu/HomeNav.dart';
+import 'package:library_app/Login.dart';
 import 'package:library_app/Models/BooksData.dart';
-//import 'package:toast/toast.dart';
 
 class UpdateBook extends StatelessWidget {
-  final id;
-
-  UpdateBook({required this.id});
+  static final String TAG = '/UpdateBook';
+  //final id;
+  //UpdateBook({this.id = ""});
 
   @override
   Widget build(BuildContext context) {
+    print("---ID = ${Get.parameters['id']}---");
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(50),
         child: AppBar(
           elevation: 0,
           flexibleSpace: FlexibleSpaceBar(
-            titlePadding: EdgeInsets.only(left: 13, bottom: 13),
+            titlePadding: EdgeInsets.only(left: 50, bottom: 13),
             title: Text(
               "Edit Buku",
               style: TextStyle(
@@ -24,11 +26,10 @@ class UpdateBook extends StatelessWidget {
             ),
           ),
           backgroundColor: Color(0xff5C549A),
-          automaticallyImplyLeading: false,
         ),
       ),
       body: FutureBuilder<List<BooksData>>(
-        future: fetchBookById(id: this.id),
+        future: fetchBookById(id: Get.parameters['id']),
         builder: (context, snapshot) {
           if (snapshot.data == null) {
             return Container(
@@ -182,8 +183,10 @@ class UpdateBook extends StatelessWidget {
                           jumlah: jumlah.text,
                         ).then(
                           (val) {
-                            print("--------- $val");
-                            Navigator.pop(context);
+                            Get.offNamedUntil(
+                              '${HomeNav.TAG}/1',
+                              ModalRoute.withName(Login.TAG),
+                            );
                             Get.rawSnackbar(
                               messageText: Text(
                                 "Berhasil merubah data buku",
@@ -224,9 +227,7 @@ class UpdateBook extends StatelessWidget {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(50),
                         splashColor: Colors.black26,
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
+                        onTap: () => Get.back(),
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(30, 13, 30, 13),
                           child: Text(

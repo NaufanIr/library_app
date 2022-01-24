@@ -15,13 +15,21 @@ class CardBorrow extends StatelessWidget {
   });
 
 //BOOK RETURN DATE
-  String returnDate({required int year, required int month, required int day, required int durasi}) {
+  String returnDate({
+    required int year,
+    required int month,
+    required int day,
+    required int durasi}) {
     var returnDate = DateTime(year, month, day).add(Duration(days: durasi));
     return DateFormat("d MMM").format(returnDate).toString().toUpperCase();
   }
 
 //BOOK RETURN DAY COUNTDOWN
-  static int returnCountDown({required int year, required int month, required int day, required int durasi}) {
+  static int returnCountDown({
+    required int year,
+    required int month,
+    required int day,
+    required int durasi}) {
     var today =
         DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day);
     var returnDate = DateTime(year, month, day).add(Duration(days: durasi));
@@ -103,7 +111,9 @@ class CardBorrow extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: "Montserrat",
                               fontSize: 17,
-                              color:  countDown.isNegative ? Colors.red[800] : Color(0xff6A639F),
+                              color: countDown.isNegative
+                                  ? Colors.red[800]
+                                  : Color(0xff6A639F),
                             ),
                           ),
                           Text(
@@ -111,7 +121,9 @@ class CardBorrow extends StatelessWidget {
                             style: TextStyle(
                               fontFamily: "Montserrat",
                               fontSize: 17,
-                              color: countDown.isNegative ? Colors.red[800] : Color(0xff6A639F),
+                              color: countDown.isNegative
+                                  ? Colors.red[800]
+                                  : Color(0xff6A639F),
                             ),
                           ),
                           Expanded(
@@ -122,7 +134,9 @@ class CardBorrow extends StatelessWidget {
                               style: TextStyle(
                                 fontFamily: "Montserrat",
                                 fontSize: 13,
-                                color: countDown.isNegative ? Colors.red[800] : Color(0xff6A639F),
+                                color: countDown.isNegative
+                                    ? Colors.red[800]
+                                    : Color(0xff6A639F),
                               ),
                             ),
                           ),

@@ -12,16 +12,24 @@ import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:library_app/Models/BorrowsData.dart';
 //import 'package:toast/toast.dart';
 
-class Borrow extends StatefulWidget {
+// class Borrow extends StatefulWidget {
+//   // static final String TAG = '/Borrow';
+//   //
+//   // final String? idBuku;
+//   //
+//   // Borrow({this.idBuku = ""});
+//
+//   @override
+//   _BorrowState createState() => _BorrowState();
+// }
+
+class Borrow extends StatelessWidget {
+  static final String TAG = '/Borrow';
+
   final String? idBuku;
 
-  Borrow({required this.idBuku});
+  Borrow({this.idBuku = ""});
 
-  @override
-  _BorrowState createState() => _BorrowState();
-}
-
-class _BorrowState extends State<Borrow> {
 //Text Editing Controller
   TextEditingController idAnggota = TextEditingController();
   TextEditingController tanggal = TextEditingController();
@@ -31,8 +39,11 @@ class _BorrowState extends State<Borrow> {
   var judul;
 
 //ID Generete
-  String? idGenerator(
-      {int? durasi, required String tgl, required String idAnggota}) {
+  String? idGenerator({
+    int? durasi,
+    required String tgl,
+    required String idAnggota,
+  }) {
     String date =
         tgl.substring(2, 4) + tgl.substring(5, 7) + tgl.substring(8, 10);
     String idMbr = idAnggota.substring(5, 8);
@@ -46,7 +57,6 @@ class _BorrowState extends State<Borrow> {
   }
 
 //Set Tanggal --Form
-  DateTime _today = DateTime.now();
   DateTime? _selectedDate;
   _selectDate(BuildContext context) async {
     DateTime? newSelectedDate = await showDatePicker(
@@ -76,21 +86,22 @@ class _BorrowState extends State<Borrow> {
   }
 
 //Tgl Kembali --Dialog
-  String returnDate(
-      {required int year,
-      required int month,
-      required int day,
-      required int durasi}) {
+  String returnDate({
+    required int year,
+    required int month,
+    required int day,
+    required int durasi,
+  }) {
     var date = DateTime(year, month, day).add(Duration(days: durasi));
     return DateFormat("d MMMM yyyy").format(date).toString();
   }
 
 //Drop Down Durasi Pinjam --Form
-  int? durasi;
+  var durasi = 0.obs;
   final List<int> durasiItem = [0, 7, 14, 30];
 
 //Kartu Cetak
-  void kartuPinjam() {
+  void kartuPinjam(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) {
@@ -101,12 +112,13 @@ class _BorrowState extends State<Borrow> {
 
   @override
   Widget build(BuildContext context) {
+    print("=======REFRESH========");
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(55),
         child: AppBar(
           flexibleSpace: FlexibleSpaceBar(
-            titlePadding: EdgeInsets.only(left: 15, bottom: 15),
+            titlePadding: EdgeInsets.only(left: 60, bottom: 13),
             title: Text(
               "Pinjam Buku",
               style: TextStyle(
@@ -114,11 +126,10 @@ class _BorrowState extends State<Borrow> {
             ),
           ),
           backgroundColor: Color(0xff5C549A),
-          automaticallyImplyLeading: false,
         ),
       ),
       body: FutureBuilder<List<BooksData>>(
-        future: fetchBookById(id: widget.idBuku),
+        future: fetchBookById(id: idBuku),
         builder: (context, snapshot) {
           if (snapshot.data == null) {
             return Container(
@@ -166,7 +177,7 @@ class _BorrowState extends State<Borrow> {
 
                             //Card Buku
                             CardBook(
-                              id: widget.idBuku,
+                              id: idBuku,
                               judul: judul = data.judul,
                               pengarang: data.pengarang,
                               penerbit: data.penerbit,
@@ -286,8 +297,11 @@ class _BorrowState extends State<Borrow> {
                             //TF DATE PICKER
                             TextField(
                               controller: tanggal,
+                              keyboardType:
+                              TextInputType.numberWithOptions(signed: true),
                               decoration: InputDecoration(
                                 labelText: "Tgl.Pinjam",
+                                hintText: "YYYY-MM-DD",
                                 border: OutlineInputBorder(),
                                 suffixIcon: IconButton(
                                   icon: Icon(Icons.calendar_today,
@@ -306,13 +320,9 @@ class _BorrowState extends State<Borrow> {
                                         fontFamily: "Montserrat"),
                                   ),
                                   onTap: () {
-                                    setState(
-                                      () {
-                                        tanggal
-                                          ..text = DateFormat('yyyy-MM-dd')
-                                              .format(_today);
-                                      },
-                                    );
+                                    tanggal
+                                      ..text = DateFormat('yyyy-MM-dd')
+                                          .format(DateTime.now());
                                     FocusScope.of(context).unfocus();
                                   },
                                 ),
@@ -323,37 +333,35 @@ class _BorrowState extends State<Borrow> {
                             ),
 
                             //DROPDOWN MENU (DURASI PINJAM)
-                            DropdownButtonFormField(
-                              hint: Text("Durasi Pinjam"),
-                              decoration: InputDecoration(
-                                border: OutlineInputBorder(),
-                              ),
-                              value: this.durasi,
-                              items: this.durasiItem.map((e) {
-                                String? kalimat(int e) {
-                                  if (e == 0) {
-                                    return "Durasi Pinjam";
-                                  } else if (e == 7) {
-                                    return "$e Hari";
-                                  } else if (e == 14) {
-                                    return "$e Hari";
-                                  } else if (e == 30) {
-                                    return "$e Hari";
+                            Obx(
+                              () => DropdownButtonFormField(
+                                decoration: InputDecoration(
+                                  labelText: "Durasi Pinjam",
+                                  border: OutlineInputBorder(),
+                                ),
+                                value: durasi.value,
+                                items: durasiItem.map((e) {
+                                  String? kalimat(int e) {
+                                    if (e == 0) {
+                                      return "-";
+                                    } else if (e == 7) {
+                                      return "$e Hari";
+                                    } else if (e == 14) {
+                                      return "$e Hari";
+                                    } else if (e == 30) {
+                                      return "$e Hari";
+                                    }
                                   }
-                                }
 
-                                return DropdownMenuItem(
-                                  value: e,
-                                  child: Text("${kalimat(e)}"),
-                                );
-                              }).toList(),
-                              onChanged: (dynamic val) {
-                                setState(
-                                  () {
-                                    durasi = val;
-                                  },
-                                );
-                              },
+                                  return DropdownMenuItem(
+                                    value: e,
+                                    child: Text("${kalimat(e)}"),
+                                  );
+                                }).toList(),
+                                onChanged: (dynamic val) {
+                                  durasi.value = val;
+                                },
+                              ),
                             ),
                           ],
                         ),
@@ -375,10 +383,9 @@ class _BorrowState extends State<Borrow> {
                         borderRadius: BorderRadius.circular(50),
                       ),
                       onPressed: () {
-                        if (this.idAnggota.text.isEmpty ||
-                            this.tanggal.text.isEmpty ||
-                            this.durasi == null ||
-                            this.durasi == 0) {
+                        if (idAnggota.text.isEmpty ||
+                            tanggal.text.isEmpty ||
+                            durasi.value == 0) {
                           Get.rawSnackbar(
                             messageText: Text(
                               "Data tidak valid",
@@ -397,18 +404,18 @@ class _BorrowState extends State<Borrow> {
                           );
                         } else {
                           idGenerator(
-                            durasi: this.durasi,
+                            durasi: durasi.value,
                             tgl: this.tanggal.text,
                             idAnggota: this.idAnggota.text,
                           );
                           addBorrow(
                             id: this.id,
                             idAnggota: this.idAnggota.text,
-                            idBuku: widget.idBuku,
+                            idBuku: idBuku,
                             tanggal: this.tanggal.text,
                             durasi: this.durasi.toString(),
                           ).then((value) {
-                            kartuPinjam();
+                            kartuPinjam(context);
                             Get.rawSnackbar(
                               messageText: Text(
                                 "Data peminjaman buku berhasil ditambahkan",
@@ -419,9 +426,9 @@ class _BorrowState extends State<Borrow> {
                                 ),
                               ),
                               backgroundColor:
-                              Colors.blueAccent.withOpacity(0.93),
+                                  Colors.blueAccent.withOpacity(0.93),
                               dismissDirection:
-                              SnackDismissDirection.HORIZONTAL,
+                                  SnackDismissDirection.HORIZONTAL,
                               margin: EdgeInsets.symmetric(
                                 vertical: 80,
                                 horizontal: 15,
@@ -504,7 +511,7 @@ class _BorrowState extends State<Borrow> {
     var bulan = int.parse(tanggal.text.toString().substring(5, 7));
     var hari = int.parse(tanggal.text.toString().substring(8, 10));
     var tglKembali =
-        returnDate(year: tahun, month: bulan, day: hari, durasi: this.durasi!);
+        returnDate(year: tahun, month: bulan, day: hari, durasi: durasi.value);
 
     return Dialog(
       backgroundColor: Colors.transparent,

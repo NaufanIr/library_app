@@ -5,6 +5,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get/get.dart';
 
 class AddBook extends StatefulWidget {
+  static final String TAG = '/AddBook';
+
   @override
   _AddBookState createState() => _AddBookState();
 }
@@ -31,7 +33,7 @@ class _AddBookState extends State<AddBook> {
     });
   }
 
-  String? _genre;
+  var _genre = "LA (Lainnya)".obs;
   final List<String> genre = [
     "AB (Auto Biografi)",
     "KP (Komputer)",
@@ -48,7 +50,6 @@ class _AddBookState extends State<AddBook> {
     jumlah.clear();
     rak.clear();
     rak.clear();
-    this._genre = null;
   }
 
   @override
@@ -59,13 +60,15 @@ class _AddBookState extends State<AddBook> {
 
   @override
   Widget build(BuildContext context) {
+    print("=============== REFRESH ===============");
+    print("=====${_genre.value}=====");
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(50),
         child: AppBar(
           elevation: 0,
           flexibleSpace: FlexibleSpaceBar(
-            titlePadding: EdgeInsets.only(left: 13, bottom: 13),
+            titlePadding: EdgeInsets.only(left: 50, bottom: 14),
             title: Text(
               "Tambah Buku",
               style: TextStyle(
@@ -73,7 +76,6 @@ class _AddBookState extends State<AddBook> {
             ),
           ),
           backgroundColor: Color(0xff5C549A),
-          automaticallyImplyLeading: false,
         ),
       ),
       body: SingleChildScrollView(
@@ -190,20 +192,22 @@ class _AddBookState extends State<AddBook> {
                       SizedBox(height: 17),
 
                       //DROPDOWN GENRE
-                      DropdownButtonFormField(
-                          hint: Text("Genre"),
-                          decoration:
-                              InputDecoration(border: OutlineInputBorder()),
-                          value: _genre,
-                          items: genre.map((minggu) {
+                      Obx(
+                        () => DropdownButtonFormField(
+                          decoration: InputDecoration(
+                            labelText: "Genre",
+                            border: OutlineInputBorder(),
+                          ),
+                          value: _genre.value,
+                          items: genre.map((e) {
                             return DropdownMenuItem(
-                                value: minggu, child: Text(minggu));
+                                value: e, child: Text(e));
                           }).toList(),
                           onChanged: (dynamic val) {
-                            setState(() {
-                              _genre = val;
-                            });
-                          }),
+                            _genre.value = val;
+                          },
+                        ),
+                      ),
                       SizedBox(height: 17),
 
                       TextField(
@@ -243,8 +247,9 @@ class _AddBookState extends State<AddBook> {
                       penerbit.text.isEmpty ||
                       tahun.text.isEmpty ||
                       jumlah.text.isEmpty ||
-                      rak.text.isEmpty ||
-                      _genre == null) {
+                      rak.text.isEmpty
+                      //_genre.value == null
+                  ) {
                     Get.rawSnackbar(
                       messageText: Text(
                         "Semua data wajib diisi",
@@ -262,7 +267,7 @@ class _AddBookState extends State<AddBook> {
                       borderRadius: 5,
                     );
                   } else {
-                    var id = _genre!.substring(0, 2) +
+                    var id = _genre.value.substring(0, 2) +
                         rak.text +
                         idCounter.toString().padLeft(3, "0");
                     addBook(

@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:library_app/Models/MembersData.dart';
 import 'package:lottie/lottie.dart';
-//import 'package:toast/toast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class AddMember extends StatefulWidget {
+  static final String TAG = '/AddMember';
+
   @override
   _AddMemberState createState() => _AddMemberState();
 }
@@ -73,7 +74,7 @@ class _AddMemberState extends State<AddMember> {
         child: AppBar(
           elevation: 0,
           flexibleSpace: FlexibleSpaceBar(
-            titlePadding: EdgeInsets.only(left: 13, bottom: 13),
+            titlePadding: EdgeInsets.only(left: 50, bottom: 13),
             title: Text(
               "Tambah Anggota",
               style: TextStyle(
@@ -81,7 +82,6 @@ class _AddMemberState extends State<AddMember> {
             ),
           ),
           backgroundColor: Color(0xff5C549A),
-          automaticallyImplyLeading: false,
         ),
       ),
       body: SingleChildScrollView(
@@ -290,7 +290,7 @@ class _AddMemberState extends State<AddMember> {
                     borderRadius: BorderRadius.circular(50),
                     splashColor: Colors.black26,
                     onTap: () {
-                      Navigator.pop(context);
+                      Get.back();
                     },
                     child: Padding(
                       padding: EdgeInsets.fromLTRB(30, 13, 30, 13),

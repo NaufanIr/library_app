@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:library_app/Bottom_navMenu/HomeNav.dart';
+import 'package:library_app/Routes/Router.dart';
 import 'package:library_app/SplashScreen.dart';
 import 'package:get/get.dart';
+import 'package:library_app/Test.dart';
 
 void main() {
   SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -17,8 +19,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: "Library App",
+      getPages: getRoutePages,
+      //initialRoute: Test.TAG,
+      //initialRoute: SplashScreen.TAG,
+      initialRoute: '${HomeNav.TAG}/0',
       debugShowCheckedModeBanner: false,
-      home:  SplashScreen(),
     );
   }
 }

@@ -14,9 +14,9 @@ Future<List<MembersData>> fetchMembers() async {
 }
 
 Future<List<MembersData>> fetchMemberById({required String? id}) async {
-  var bookID = {'id': id};
+  var memberID = {'id': id};
   final response = await http.post(Uri.parse("${API.showAnggotaById}"),
-      body: json.encode(bookID));
+      body: json.encode(memberID));
   List? jsonResponse = json.decode(response.body);
   if (response.statusCode == 200) {
     return jsonResponse!.map((e) => MembersData.fromJson(e)).toList();

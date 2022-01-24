@@ -1,39 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:library_app/Bottom_navMenu/Home/BookReturn.dart';
 import 'package:library_app/Models/BorrowsData.dart';
 import 'package:library_app/Widgets/CardBorrow.dart';
 
-class BorrowsList extends StatefulWidget {
-  @override
-  _BorrowsListState createState() => _BorrowsListState();
-}
+class BorrowsList extends StatelessWidget {
 
-class _BorrowsListState extends State<BorrowsList> {
-
-  /// STREAM BUILDER
-  // StreamController<List> streamController = StreamController();
-// Timer timer;
-//
-// Future<List> getPeminjaman() async {
-//   var response = await http.get("${API.showPeminjaman}");
-//   final data = json.decode(response.body);
-//   streamController.add(data);
-// }
-//
-// @override
-// void initState() {
-//   getPeminjaman();
-//   timer = Timer.periodic(Duration(seconds: 3), (timer) => getPeminjaman());
-//   super.initState();
-// }
-//
-// @override
-// void dispose() {
-//   if (timer.isActive) {
-//     timer.cancel();
-//   }
-//   super.dispose();
-// }
+  static final String TAG = '/BorrowList';
 
   @override
   Widget build(BuildContext context) {
@@ -110,22 +83,25 @@ class _BorrowsListState extends State<BorrowsList> {
                           tanggal: data.tanggal,
                           durasi: data.durasi,
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) {
-                                  return bookReturn(
-                                    id: data.id,
-                                    denda: CardBorrow.returnCountDown(
-                                      year: tahun,
-                                      month: bulan,
-                                      day: hari,
-                                      durasi: duration,
-                                    ),
-                                  );
-                                },
-                              ),
-                            );
+                            //[GETX] GOING TO ROUTE /UpdateBook/HE90278
+                            // Navigator.push(
+                            //   context,
+                            //   MaterialPageRoute(
+                            //     builder: (context) {
+                            //       return BookReturn(
+                            //         id: data.id,
+                            //         denda: CardBorrow.returnCountDown(
+                            //           year: tahun,
+                            //           month: bulan,
+                            //           day: hari,
+                            //           durasi: duration,
+                            //         ),
+                            //       );
+                            //     },
+                            //   ),
+                            // );
+                            Get.toNamed('${BookReturn.TAG}/${data.id}');
+                            //Get.toNamed('${BookReturn.TAG}');
                           },
                         ),
                       );
@@ -136,65 +112,6 @@ class _BorrowsListState extends State<BorrowsList> {
               }
             },
           ),
-
-          ///LIST CARD RETURN SCHEDULE --WITH STREAM BUILDER
-          // StreamBuilder(
-//   stream: streamController.stream,
-//   builder: (context, snapshot) {
-//     if (snapshot.data == null) {
-//       return SliverList(
-//         delegate: SliverChildListDelegate(
-//           [
-//             Container(
-//               height: MediaQuery.of(context).size.height,
-//               width: MediaQuery.of(context).size.width,
-//               child: Center(
-//                 child: CircularProgressIndicator(),
-//               ),
-//             ),
-//           ],
-//         ),
-//       );
-//     } else {
-//       return SliverList(
-//         delegate: SliverChildBuilderDelegate(
-//           (BuildContext context, int index) {
-//             return Padding(
-//               padding:
-//                   EdgeInsets.symmetric(vertical: 11, horizontal: 7),
-//               child: CardBorrow(
-//                 context: context,
-//                 snapshot: snapshot,
-//                 index: index,
-//                 id: snapshot.data[index]['kd_peminjaman'],
-//                 judul: snapshot.data[index]['judul'],
-//                 peminjam: snapshot.data[index]['nama'],
-//                 tanggal: snapshot.data[index]['tgl_peminjaman'],
-//                 durasi: snapshot.data[index]['durasi'],
-//                 onTap: () {
-//                   Navigator.push(
-//                     context,
-//                     MaterialPageRoute(
-//                       builder: (context) {
-//                         return bookReturn(
-//                           id: snapshot.data[index]['kd_peminjaman'],
-//                         );
-//                       },
-//                     ),
-//                   );
-//                 },
-//               ),
-//             );
-//             //cardReturnDeadline(context, snapshot, index);
-//           },
-//           childCount: snapshot.data.length,
-//         ),
-//       );
-//     }
-//   },
-// ),
-
-//MARGIN BOTTOM
 
           SliverToBoxAdapter(
             child: Container(

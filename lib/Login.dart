@@ -1,56 +1,35 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:http/http.dart' as http;
 import 'package:library_app/API.dart';
 import 'package:library_app/Bottom_navMenu/HomeNav.dart';
+import 'package:library_app/Models/EmployeeData.dart';
 
-class Login extends StatefulWidget {
-  @override
-  _LoginState createState() => _LoginState();
-}
+class Login extends StatelessWidget {
+  static final String TAG = '/Login';
 
-class _LoginState extends State<Login> {
   TextEditingController id = TextEditingController();
   TextEditingController pass = TextEditingController();
 
-  String? user;
-  Future _login() async {
-    final response = await http
-        .post(Uri.parse("${API.login}"), body: {"id": id.text, "password": pass.text});
-    var userAccount = jsonDecode(response.body);
-    if (userAccount.length == 0) {
-      _showSnackBar();
-      print("Gagal Masuk");
-    } else {
-      Navigator.pushReplacement(
-          context, MaterialPageRoute(builder: (context) => HomeNav()));
-    }
-    user = userAccount[0]['nama'];
-  }
+  var _visible = true.obs;
 
-//SNACKBAR
-  final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
-  _showSnackBar() {
-    final snackbar = SnackBar(
-        content: Text("Id/Password Salah", textAlign: TextAlign.center),
-        backgroundColor: Colors.red[400],
-        duration: Duration(seconds: 5));
-    _scaffoldKey.currentState!.showSnackBar(snackbar);
-  }
+  String? nama, jabatan;
 
-  bool _visible = true;
 
   @override
   Widget build(BuildContext context) {
+    print("=====REFRESH=====");
     return Scaffold(
-      key: _scaffoldKey,
       body: Container(
         height: MediaQuery.of(context).size.height,
         width: MediaQuery.of(context).size.width,
         decoration: BoxDecoration(
           image: DecorationImage(
-              image: AssetImage("images/Bg_Login.png"), fit: BoxFit.cover),
+            image: AssetImage("images/Bg_Login.png"),
+            fit: BoxFit.cover,
+          ),
         ),
         child: SingleChildScrollView(
           child: Padding(
@@ -67,19 +46,25 @@ class _LoginState extends State<Login> {
                   ),
                 ),
                 SizedBox(height: 10),
+
                 //TEXT WELCOME
-                Text("Welcome!",
-                    style: TextStyle(
-                        fontFamily: "Montserrat",
-                        fontSize: 38,
-                        color: Colors.white)),
+                Text(
+                  "Welcome!",
+                  style: TextStyle(
+                    fontFamily: "Montserrat",
+                    fontSize: 38,
+                    color: Colors.white,
+                  ),
+                ),
                 SizedBox(height: 30.0),
+
                 //FORM LOGIN
                 Container(
                   width: double.infinity,
                   decoration: BoxDecoration(
-                      color: Colors.orangeAccent,
-                      borderRadius: BorderRadius.circular(12)),
+                    color: Colors.orangeAccent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
                   padding: EdgeInsets.fromLTRB(15, 40, 15, 30),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -87,94 +72,129 @@ class _LoginState extends State<Login> {
                       //TF USERNAME/ID
                       TextField(
                         controller: id,
+                        cursorColor: Colors.white,
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
-                            hintText: "ID",
-                            enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.deepOrangeAccent),
-                                borderRadius: BorderRadius.circular(23)),
-                            focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                                borderRadius: BorderRadius.circular(23)),
-                            prefixIcon: Icon(
-                              Icons.person,
-                              color: Colors.white,
-                            ),
-                            filled: true,
-                            fillColor: Colors.deepOrangeAccent),
-                        cursorColor: Colors.white,
-                      ),
-                      SizedBox(
-                        height: 40,
+                          hintText: "ID",
+                          enabledBorder: OutlineInputBorder(
+                            borderSide:
+                                BorderSide(color: Colors.deepOrangeAccent),
+                            borderRadius: BorderRadius.circular(23),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                            borderRadius: BorderRadius.circular(23),
+                          ),
+                          prefixIcon: Icon(
+                            Icons.person,
+                            color: Colors.white,
+                          ),
+                          filled: true,
+                          fillColor: Colors.deepOrangeAccent,
+                        ),
                       ),
 
+                      SizedBox(height: 40),
+
                       //TF PASSWORD
-                      TextField(
-                        controller: pass,
-                        obscureText: _visible,
-                        style: TextStyle(color: Colors.white),
-                        decoration: InputDecoration(
+                      Obx(
+                        () => TextField(
+                          controller: pass,
+                          obscureText: _visible.value,
+                          cursorColor: Colors.white,
+                          style: TextStyle(color: Colors.white),
+                          decoration: InputDecoration(
                             hintText: "Password",
                             enabledBorder: OutlineInputBorder(
-                                borderSide:
-                                    BorderSide(color: Colors.deepOrangeAccent),
-                                borderRadius: BorderRadius.circular(23)),
+                              borderSide:
+                                  BorderSide(color: Colors.deepOrangeAccent),
+                              borderRadius: BorderRadius.circular(23),
+                            ),
                             focusedBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                                borderRadius: BorderRadius.circular(23)),
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(23),
+                            ),
                             prefixIcon: Icon(
                               Icons.lock,
                               color: Colors.white,
                             ),
-                            suffixIcon: IconButton(
-                                icon: Icon(
-                                    _visible
-                                        ? Icons.visibility
-                                        : Icons.visibility_off,
-                                    color: Colors.white),
-                                onPressed: () {
-                                  setState(() {
-                                    _visible = !_visible;
-                                  });
-                                }),
                             filled: true,
-                            fillColor: Colors.deepOrangeAccent),
-                        cursorColor: Colors.white,
+                            fillColor: Colors.deepOrangeAccent,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                  _visible.value
+                                      ? Icons.visibility
+                                      : Icons.visibility_off,
+                                  color: Colors.white),
+                              onPressed: () {
+                                _visible.value = !_visible.value;
+                              },
+                            ),
+                          ),
+                        ),
                       ),
 
-                      SizedBox(
-                        height: 70,
-                      ),
+                      SizedBox(height: 70),
 
                       //BUTTON LOGIN
                       Center(
                         child: RaisedButton(
-                          child: Text("LOGIN",
-                              style: TextStyle(
-                                  fontFamily: "Montserrat",
-                                  fontSize: 20,
-                                  color: Colors.white)),
+                          child: Text(
+                            "LOGIN",
+                            style: TextStyle(
+                              fontFamily: "Montserrat",
+                              fontSize: 20,
+                              color: Colors.white,
+                            ),
+                          ),
                           color: Colors.blueAccent,
                           padding: EdgeInsets.fromLTRB(100, 15, 100, 15),
                           shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20)),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
                           onPressed: () {
-                            _login();
+                            login(id: id.text, pass: pass.text).then(
+                              (data) {
+                                if (data.length == 0) {
+                                  Get.rawSnackbar(
+                                    messageText: Text(
+                                      "Id/Password Salah",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    backgroundColor: Colors.redAccent,
+                                    padding: EdgeInsets.symmetric(
+                                      vertical: 12,
+                                      horizontal: 10,
+                                    ),
+                                    borderRadius: 5,
+                                  );
+                                } else {
+                                  nama = data[0].nama;
+                                  jabatan = data[0].jabatan;
+                                  Get.offNamed('${HomeNav.TAG}/0?id=${id.text}&nama=$nama&jabatan=$jabatan');
+                                }
+                              },
+                            );
                           },
                         ),
-                      )
+                      ),
                     ],
                   ),
                 ),
                 SizedBox(height: 90),
+
                 //ALL RIGHT RESERVED
                 Text(
                   "All Right Reserved",
                   style: TextStyle(
-                      fontFamily: "Montserrat",
-                      fontSize: 10,
-                      color: Colors.white),
+                    fontFamily: "Montserrat",
+                    fontSize: 10,
+                    color: Colors.white,
+                  ),
                 ),
               ],
             ),

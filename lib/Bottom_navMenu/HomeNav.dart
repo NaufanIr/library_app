@@ -1,38 +1,41 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:library_app/Bottom_navMenu/Books/Books.dart';
 import 'package:library_app/Bottom_navMenu/Home/Home.dart';
 import 'package:library_app/Bottom_navMenu/Members/Members.dart';
 
 class HomeNav extends StatefulWidget {
+  static final String TAG = '/HomeNav';
+
+  int index;
+
+  HomeNav({this.index = 0});
+
   @override
   _HomeNavState createState() => _HomeNavState();
 }
 
 class _HomeNavState extends State<HomeNav> {
-  int _SelectedIndex = 0;
-
-  PageController _pageController = PageController();
+  int? _SelectedIndex;
 
   List<Widget> _screens = <Widget>[Home(), Books(), Members()];
-
-  void _onPageChanged(int index) {}
 
   void _onItemTap(int index) {
     setState(() {
       _SelectedIndex = index;
-      _pageController.jumpToPage(index);
     });
+  }
+
+  @override
+  void initState() {
+    _SelectedIndex = int.parse(Get.parameters['index']!);
+    super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        children: _screens,
-        onPageChanged: _onPageChanged,
-        physics: NeverScrollableScrollPhysics(),
-      ),
+      body: _screens.elementAt(_SelectedIndex!),
       extendBody: true,
       bottomNavigationBar: Container(
         margin: EdgeInsets.only(bottom: 10, left: 5, right: 5),
@@ -52,7 +55,7 @@ class _HomeNavState extends State<HomeNav> {
             child: BottomNavigationBar(
               backgroundColor: Colors.orange[300],
               iconSize: 25,
-              currentIndex: _SelectedIndex, //widget.index
+              currentIndex: _SelectedIndex!, //widget.index
               onTap: _onItemTap,
               selectedItemColor: Color(0xff6A639F),
               items: [

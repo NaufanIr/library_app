@@ -1,18 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:library_app/Bottom_navMenu/HomeNav.dart';
+import 'package:library_app/Login.dart';
 import 'package:library_app/Models/MembersData.dart';
 
-class UpdateMember extends StatefulWidget {
-  final id;
-
-  UpdateMember({required this.id});
-
-  @override
-  _UpdateMemberState createState() => _UpdateMemberState();
-}
-
-class _UpdateMemberState extends State<UpdateMember> {
-  String? _selectedGender;
+class UpdateMember extends StatelessWidget {
+  static final String TAG = '/UpdateMember';
+  // final id;
+  // UpdateMember({this.id = ""});
 
   final List<String> genderList = [
     "Laki-laki",
@@ -21,13 +16,15 @@ class _UpdateMemberState extends State<UpdateMember> {
 
   @override
   Widget build(BuildContext context) {
+    print("=============== REFRESH ===============");
+    print("---ID = ${Get.parameters['id']}---");
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(50),
         child: AppBar(
           elevation: 0,
           flexibleSpace: FlexibleSpaceBar(
-            titlePadding: EdgeInsets.only(left: 13, bottom: 13),
+            titlePadding: EdgeInsets.only(left: 50, bottom: 13),
             title: Text(
               "Edit Anggota",
               style: TextStyle(
@@ -35,13 +32,12 @@ class _UpdateMemberState extends State<UpdateMember> {
             ),
           ),
           backgroundColor: Color(0xff5C549A),
-          automaticallyImplyLeading: false,
+          //automaticallyImplyLeading: false,
         ),
       ),
       body: FutureBuilder<List<MembersData>>(
-        future: fetchMemberById(id: widget.id),
+        future: fetchMemberById(id: Get.parameters['id']),
         builder: (context, snapshot) {
-          print("=============== REFRESH ===============");
           if (snapshot.data == null) {
             return Container(
               width: MediaQuery.of(context).size.width,
@@ -52,6 +48,10 @@ class _UpdateMemberState extends State<UpdateMember> {
             );
           } else {
             final data = snapshot.data![0];
+            var _selectedGender = data.gender == "L"
+                ? genderList[0].obs
+                : genderList[1].obs;
+
             TextEditingController nama =
                 TextEditingController(text: "${data.nama}");
             TextEditingController kelas =
@@ -123,27 +123,25 @@ class _UpdateMemberState extends State<UpdateMember> {
                           SizedBox(height: 17),
 
                           //DROPDOWN GENDER
-                          DropdownButtonFormField(
-                            decoration: InputDecoration(
-                              border: OutlineInputBorder()
-                            ),
-                            hint: Text("Jenis Kelamin"),
-                            value:
-                            data.gender == "L" ? genderList[0] : genderList[1],
-                            items: genderList.map(
-                              (val) {
-                                return DropdownMenuItem(
-                                  value: val,
-                                  child: Text(val),
-                                );
-                              },
-                            ).toList(),
-                            onChanged: (String? val) {
-                              setState(() {
-                                  _selectedGender = val!;
-                                });
-                              print("onChanged : $_selectedGender || $val");
-                            },
+                          Obx(() =>
+                              DropdownButtonFormField(
+                                decoration: InputDecoration(
+                                  labelText: "Jenis Kelamin",
+                                  border: OutlineInputBorder(),
+                                ),
+                                value: _selectedGender.value,
+                                onChanged: (String? val){
+                                  _selectedGender.value = val!;
+                                },
+                                items: genderList.map(
+                                      (val) {
+                                    return DropdownMenuItem(
+                                      value: val,
+                                      child: Text(val),
+                                    );
+                                  },
+                                ).toList(),
+                              ),
                           ),
                           SizedBox(height: 17),
 
@@ -208,7 +206,10 @@ class _UpdateMemberState extends State<UpdateMember> {
                           gender: _selectedGender == "Perempuan" ? "P" : "L",
                         ).then(
                           (val) {
-                            Navigator.pop(context);
+                            Get.offNamedUntil(
+                              '${HomeNav.TAG}/2',
+                              ModalRoute.withName(Login.TAG),
+                            );
                             Get.rawSnackbar(
                               messageText: Text(
                                 "Berhasil merubah data anggota",
@@ -219,9 +220,9 @@ class _UpdateMemberState extends State<UpdateMember> {
                                 ),
                               ),
                               backgroundColor:
-                              Colors.blueAccent.withOpacity(0.93),
+                                  Colors.blueAccent.withOpacity(0.93),
                               dismissDirection:
-                              SnackDismissDirection.HORIZONTAL,
+                                  SnackDismissDirection.HORIZONTAL,
                               margin: EdgeInsets.symmetric(
                                 vertical: 80,
                                 horizontal: 15,
@@ -249,9 +250,7 @@ class _UpdateMemberState extends State<UpdateMember> {
                       child: InkWell(
                         borderRadius: BorderRadius.circular(50),
                         splashColor: Colors.black26,
-                        onTap: () {
-                          Navigator.pop(context);
-                        },
+                        onTap: () => Get.back(),
                         child: Padding(
                           padding: EdgeInsets.fromLTRB(30, 13, 30, 13),
                           child: Text(

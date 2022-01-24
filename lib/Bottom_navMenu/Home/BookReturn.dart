@@ -7,46 +7,50 @@ import 'package:library_app/Models/ReturnsData.dart';
 import 'package:library_app/Widgets/CardBorrow.dart';
 import 'package:lottie/lottie.dart';
 
-class bookReturn extends StatefulWidget {
-  var id;
-  int? denda;
+class BookReturn extends StatelessWidget {
+  static final String TAG = '/BookReturn';
 
-  bookReturn({required this.id, this.denda});
+  //int? denda = -142;
+  int denda = 0;
+  // Future GetDenda() async {
+  //   denda = await fetchBorrowById(id: Get.parameters['id']).then(
+  //         (data) => CardBorrow.returnCountDown(
+  //       year: int.parse(data[0].tanggal!.substring(0, 4)),
+  //       month: int.parse(data[0].tanggal!.substring(5, 7)),
+  //       day: int.parse(data[0].tanggal!.substring(8, 10)),
+  //       durasi: int.parse(data[0].durasi!),
+  //     ),
+  //   );
+  // }
 
-  @override
-  _bookReturnState createState() => _bookReturnState();
-}
-
-class _bookReturnState extends State<bookReturn> {
 //TextEditingController
   TextEditingController tgl = TextEditingController();
   TextEditingController keterlambatan = TextEditingController();
   TextEditingController ket = TextEditingController(text: "");
 
 //Date Picker
-  DateTime _today = DateTime.now();
   DateTime? _selectedDate;
   _selectDate(BuildContext context) async {
     DateTime? newSelectedDate = await showDatePicker(
-        context: context,
-        initialDate: _selectedDate != null ? _selectedDate! : DateTime.now(),
-        firstDate: DateTime(2000),
-        lastDate: DateTime(2040),
-        builder: (BuildContext context, Widget? child) {
-          return Theme(
-            data: ThemeData.dark().copyWith(
-              colorScheme: ColorScheme.dark(
-                primary: Colors.orangeAccent,
-                onPrimary: Colors.white,
-                surface: Colors.orangeAccent, //BG HEADER
-                onSurface: Colors.white, //TEXT COLOR
-              ),
-              dialogBackgroundColor: Color(0xff5C549A),
+      context: context,
+      initialDate: _selectedDate != null ? _selectedDate! : DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2040),
+      builder: (BuildContext context, Widget? child) {
+        return Theme(
+          data: ThemeData.dark().copyWith(
+            colorScheme: ColorScheme.dark(
+              primary: Colors.orangeAccent,
+              onPrimary: Colors.white,
+              surface: Colors.orangeAccent, //BG HEADER
+              onSurface: Colors.white, //TEXT COLOR
             ),
-            child: child!,
-          );
-        });
-
+            dialogBackgroundColor: Color(0xff5C549A),
+          ),
+          child: child!,
+        );
+      },
+    );
     if (newSelectedDate != null) {
       _selectedDate = newSelectedDate;
       tgl..text = DateFormat("yyyy-MM-dd").format(_selectedDate!);
@@ -54,8 +58,6 @@ class _bookReturnState extends State<bookReturn> {
   }
 
 //Switch Denda
-  bool isDenda = false;
-  int? totalDenda;
   Widget? showFormDenda(bool denda) {
     if (denda == false) {
       return Container();
@@ -64,21 +66,22 @@ class _bookReturnState extends State<bookReturn> {
     }
   }
 
-  int cetakDenda(int penalty, int kategori) {
-    if (penalty < 0) {
-      penalty = penalty * -1;
+  int? totalDenda;
+  int cetakDenda(int keterlambatan, int kategori) {
+    if (keterlambatan < 0) {
+      keterlambatan = keterlambatan * -1;
     } else {
-      penalty = 0;
+      keterlambatan = 0;
     }
-    return this.totalDenda = (penalty * 1000) + kategori;
+    return this.totalDenda = (keterlambatan * 1000) + kategori;
   }
 
 //DropDown Buku Rusak
-  int? _selectedRusak = 0;
+  var _selectedRusak = 0.obs;
   final List<int> rusak = [0, 25000, 75000, 200000];
 
 //Selesai Pinjam Logic
-  void selesaiPinjam() {
+  void selesaiPinjam(BuildContext context) {
     showDialog(
       context: context,
       builder: (context) {
@@ -89,24 +92,52 @@ class _bookReturnState extends State<bookReturn> {
 
   @override
   Widget build(BuildContext context) {
+    var isDenda = denda.isNegative ? true.obs : false.obs;
+    // fetchBorrowById(id: Get.parameters['id']).then(
+    //         (data) => denda = CardBorrow.returnCountDown(
+    //       year: int.parse(data[0].tanggal!.substring(0, 4)),
+    //       month: int.parse(data[0].tanggal!.substring(5, 7)),
+    //       day: int.parse(data[0].tanggal!.substring(8, 10)),
+    //       durasi: int.parse(data[0].durasi!),
+    //     ));
+    print("=======REFRESH========");
+    print("---Denda = $denda---");
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(55),
         child: AppBar(
-          automaticallyImplyLeading: false,
-          title: Text(
-            "Pengembalian Buku",
-            style: TextStyle(
-                fontFamily: "Montserrat", fontSize: 18, color: Colors.white),
+          elevation: 5,
+          flexibleSpace: FlexibleSpaceBar(
+            titlePadding: EdgeInsets.only(left: 60, bottom: 13),
+            title: Text(
+              "Pengembalian Buku",
+              style: TextStyle(
+                  fontFamily: "Montserrat", fontSize: 18, color: Colors.white),
+            ),
           ),
           backgroundColor: Color(0xff5C549A),
         ),
       ),
       body: FutureBuilder<List<BorrowsData>>(
-        future: fetchBorrowById(id: widget.id),
+        future: fetchBorrowById(id: Get.parameters['id']),
         builder: (context, snapshot) {
-          try {
+          if (snapshot.data == null) {
+            return Container(
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height,
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
+            );
+          } else {
             final data = snapshot.data![0];
+            denda = CardBorrow.returnCountDown(
+              year: int.parse(data.tanggal!.substring(0, 4)),
+              month: int.parse(data.tanggal!.substring(5, 7)),
+              day: int.parse(data.tanggal!.substring(8, 10)),
+              durasi: int.parse(data.durasi!),
+            );
+            //var isDenda = denda.isNegative ? true.obs : false.obs;
             return SingleChildScrollView(
               child: Padding(
                 padding: EdgeInsets.fromLTRB(5, 10, 5, 30),
@@ -156,7 +187,7 @@ class _bookReturnState extends State<bookReturn> {
                     //Waktu
                     Container(
                       width: MediaQuery.of(context).size.width,
-                      margin: EdgeInsets.only(bottom: 17, left: 3, right: 3),
+                      margin: EdgeInsets.fromLTRB(3, 0, 3, 17),
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(10),
                         color: Colors.white,
@@ -179,9 +210,7 @@ class _bookReturnState extends State<bookReturn> {
                                   color: Colors.black54,
                                   fontWeight: FontWeight.w500),
                             ),
-                            SizedBox(
-                              height: 17,
-                            ),
+                            SizedBox(height: 17),
 
                             //TF DATE PICKER
                             TextField(
@@ -209,13 +238,10 @@ class _bookReturnState extends State<bookReturn> {
                                         fontFamily: "Montserrat"),
                                   ),
                                   onTap: () {
-                                    setState(
-                                      () {
-                                        tgl
-                                          ..text = DateFormat('yyyy-MM-dd')
-                                              .format(_today);
-                                      },
-                                    );
+                                    tgl
+                                      ..text = DateFormat('yyyy-MM-dd')
+                                          .format(DateTime.now());
+                                    FocusScope.of(context).unfocus();
                                   },
                                 ),
                               ),
@@ -251,16 +277,14 @@ class _bookReturnState extends State<bookReturn> {
                                 color: Colors.black54,
                                 fontWeight: FontWeight.w500),
                           ),
-                          Switch(
-                            value: this.isDenda =
-                                widget.denda!.isNegative ? !isDenda : isDenda,
-                            onChanged: (val) {
-                              setState(
-                                () {
-                                  isDenda = val;
-                                },
-                              );
-                            },
+                          Obx(
+                            () => Switch(
+                              value: isDenda.value,
+                              onChanged: (val) {
+                                isDenda.value = val;
+                                print("===${isDenda.value}===");
+                              },
+                            ),
                           ),
                         ],
                       ),
@@ -268,7 +292,7 @@ class _bookReturnState extends State<bookReturn> {
 
                     //Form Denda
                     Container(
-                      child: showFormDenda(isDenda),
+                      child: Obx(() => showFormDenda(isDenda.value)!),
                     ),
                     SizedBox(
                       height: 50,
@@ -309,7 +333,7 @@ class _bookReturnState extends State<bookReturn> {
                             borderRadius: 5,
                           );
                         } else {
-                          selesaiPinjam();
+                          selesaiPinjam(context);
                         }
                       },
                     ),
@@ -348,15 +372,6 @@ class _bookReturnState extends State<bookReturn> {
                 ),
               ),
             );
-          } catch (e) {
-            return Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-            //isError();
           }
         },
       ),
@@ -382,36 +397,36 @@ class _bookReturnState extends State<bookReturn> {
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           //DROPDOWN JENIS DENDA
-          DropdownButtonFormField(
-            hint: Text("Rusak/Cacat"),
-            decoration: InputDecoration(
-              border: OutlineInputBorder(),
-            ),
-            value: this._selectedRusak,
-            items: this.rusak.map((e) {
-              String kalimat(int e) {
-                if (e == 25000) {
-                  return "Rp.${e.toString()} => Rusak Ringan";
-                } else if (e == 75000) {
-                  return "Rp.${e.toString()} => Rusak Sedang";
-                } else if (e == 200000) {
-                  return "Rp.${e.toString()} => Rusak Berat/Hilang";
-                } else {
-                  return "None";
+          Obx(
+            () => DropdownButtonFormField(
+              hint: Text("Rusak/Cacat"),
+              decoration: InputDecoration(
+                border: OutlineInputBorder(),
+              ),
+              value: _selectedRusak.value,
+              items: rusak.map((e) {
+                String kalimat(int e) {
+                  if (e == 25000) {
+                    return "Rp.${e.toString()} => Rusak Ringan";
+                  } else if (e == 75000) {
+                    return "Rp.${e.toString()} => Rusak Sedang";
+                  } else if (e == 200000) {
+                    return "Rp.${e.toString()} => Rusak Berat/Hilang";
+                  } else {
+                    return "None";
+                  }
                 }
-              }
-              return DropdownMenuItem(
-                value: e,
-                child: Text("${kalimat(e)}"),
-              );
-            }).toList(),
-            onChanged: (dynamic val) {
-              setState(
-                () {
-                  _selectedRusak = val;
-                },
-              );
-            },
+
+                return DropdownMenuItem(
+                  value: e,
+                  child: Text("${kalimat(e)}"),
+                );
+              }).toList(),
+              onChanged: (dynamic val) {
+                _selectedRusak.value = val;
+                //setState(() {},);
+              },
+            ),
           ),
           SizedBox(height: 15),
 
@@ -428,17 +443,19 @@ class _bookReturnState extends State<bookReturn> {
           ),
           SizedBox(height: 25),
 
-          Text(
-            "DENDA : ${NumberFormat.currency(
-              locale: 'id',
-              symbol: 'Rp ',
-              decimalDigits: 0,
-            ).format(cetakDenda(widget.denda!, _selectedRusak!))}",
-            style: TextStyle(
-              fontSize: 14,
-              fontFamily: "Montserrat",
-              color: Colors.black45,
-              fontWeight: FontWeight.bold,
+          Obx(
+            () => Text(
+              "DENDA : ${NumberFormat.currency(
+                locale: 'id',
+                symbol: 'Rp ',
+                decimalDigits: 0,
+              ).format(cetakDenda(denda, _selectedRusak.value))}",
+              style: TextStyle(
+                fontSize: 14,
+                fontFamily: "Montserrat",
+                color: Colors.black45,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
         ],
@@ -494,36 +511,34 @@ class _bookReturnState extends State<bookReturn> {
                       Text("Konfirmasi", style: TextStyle(color: Colors.blue)),
                   onPressed: () {
                     addReturn(
-                      idPeminjaman: widget.id,
+                      idPeminjaman: Get.parameters['id'],
                       tanggal: tgl.text,
                       denda: totalDenda.toString(),
                       ket: ket.text,
                     ).then((e) {
                       Navigator.pop(context);
                       Navigator.pop(context);
-                    Get.rawSnackbar(
-                      messageText: Text(
-                        "Buku telah dikembalikan",
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          fontSize: 13,
-                          color: Colors.white,
+                      Get.rawSnackbar(
+                        messageText: Text(
+                          "Buku telah dikembalikan",
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 13,
+                            color: Colors.white,
+                          ),
                         ),
-                      ),
-                      backgroundColor:
-                      Colors.blueAccent.withOpacity(0.93),
-                      dismissDirection:
-                      SnackDismissDirection.HORIZONTAL,
-                      margin: EdgeInsets.symmetric(
-                        vertical: 80,
-                        horizontal: 15,
-                      ),
-                      padding: EdgeInsets.symmetric(
-                        vertical: 12,
-                        horizontal: 10,
-                      ),
-                      borderRadius: 5,
-                    );
+                        backgroundColor: Colors.blueAccent.withOpacity(0.93),
+                        dismissDirection: SnackDismissDirection.HORIZONTAL,
+                        margin: EdgeInsets.symmetric(
+                          vertical: 80,
+                          horizontal: 15,
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          vertical: 12,
+                          horizontal: 10,
+                        ),
+                        borderRadius: 5,
+                      );
                     });
                   },
                 ),

@@ -1,19 +1,18 @@
 import 'package:flutter/material.dart';
 
-class CardMember extends StatelessWidget {
-  final String? id, nama, kelas, telp, alamat, gender;
-  int? typeCard = 1;
-  final Function? onTap;
+class CardEmployee extends StatelessWidget {
 
+  late final String id, nama, jabatan, telp, alamat, gender;
+  late final typeCard = 1;
+  late final Function? onTap;
 
-  CardMember({
+  CardEmployee({
     required this.id,
     required this.nama,
-    required this.kelas,
     required this.telp,
+    required this.jabatan,
     required this.alamat,
     required this.gender,
-    this.typeCard,
     this.onTap,
   });
 
@@ -44,7 +43,7 @@ class CardMember extends StatelessWidget {
               children: [
                 //NAMA
                 Text(
-                  nama!,
+                  nama,
                   overflow: TextOverflow.ellipsis,
                   maxLines: 1,
                   style: TextStyle(
@@ -61,13 +60,15 @@ class CardMember extends StatelessWidget {
                   children: [
                     //GAMBAR KATEGORI
                     Container(
-                      height: typeCard == 2 ? 60 : 70,
-                      width: typeCard == 2 ? 60 : 70,
+                      height: 70,//typeCard == 2 ? 60 : 70,
+                      width: 70,//typeCard == 2 ? 60 : 70,
                       decoration: BoxDecoration(
                         image: DecorationImage(
-                            image: AssetImage(gender == 'L'
-                                ? "images/persons/boy.png"
-                                : "images/persons/girl.png"),
+                            image: AssetImage(
+                              gender == 'L'
+                                ? "images/persons/man.png"
+                                : "images/persons/woman.png",
+                            ),
                             fit: BoxFit.cover),
                       ),
                     ),
@@ -100,11 +101,11 @@ class CardMember extends StatelessWidget {
                               ),
                             ),
 
-                            //KELAS
+                            //JABATAN
                             Row(
                               children: [
                                 Text(
-                                  "Kelas : ",
+                                  "Jabatan : ",
                                   style: TextStyle(
                                     fontFamily: "Montserrat",
                                     fontSize: typeCard == 2 ? 9.5 : 10.5,
@@ -112,7 +113,7 @@ class CardMember extends StatelessWidget {
                                   ),
                                 ),
                                 Text(
-                                  kelas!,
+                                  jabatan,
                                   overflow: TextOverflow.ellipsis,
                                   maxLines: 1,
                                   style: TextStyle(
@@ -136,7 +137,7 @@ class CardMember extends StatelessWidget {
                                 ),
                                 Expanded(
                                   child: Text(
-                                    telp!,
+                                    telp,
                                     overflow: TextOverflow.ellipsis,
                                     maxLines: 1,
                                     style: TextStyle(
@@ -162,7 +163,7 @@ class CardMember extends StatelessWidget {
                                           style: TextStyle(
                                             fontFamily: "Montserrat",
                                             fontSize:
-                                                typeCard == 2 ? 9.5 : 10.5,
+                                            typeCard == 2 ? 9.5 : 10.5,
                                             color: Color(0xff5C549A),
                                           ),
                                         ),
@@ -170,7 +171,7 @@ class CardMember extends StatelessWidget {
                                           text: alamat,
                                           style: TextStyle(
                                             fontSize:
-                                                typeCard == 2 ? 9.5 : 10.5,
+                                            typeCard == 2 ? 9.5 : 10.5,
                                             color: Color(0xff5C549A),
                                             height: 1.5,
                                           ),

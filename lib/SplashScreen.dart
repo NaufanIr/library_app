@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:library_app/Login.dart';
 
 class SplashScreen extends StatefulWidget {
+  static final String TAG = '/';
+
   @override
   _SplashScreenState createState() => _SplashScreenState();
 }

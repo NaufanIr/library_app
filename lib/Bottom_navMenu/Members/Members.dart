@@ -1,44 +1,17 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/painting.dart';
+import 'package:get/get.dart';
 import 'package:library_app/Bottom_navMenu/Members/AddMember.dart';
 import 'package:library_app/Bottom_navMenu/Members/UpdateMember.dart';
 import 'package:library_app/Models/MembersData.dart';
 import 'package:library_app/Widgets/CardMember.dart';
 import '../../Search.dart';
 
-class Members extends StatefulWidget {
-  @override
-  _MembersState createState() => _MembersState();
-}
-
-class _MembersState extends State<Members> {
-
-  ///STREAM BUILDER
-  // Timer timer;
-  // StreamController<List> streamController = StreamController();
-  // Future<List> getMembers() async {
-  //   var response = await http.get("${API.showAnggota}");
-  //   final data = json.decode(response.body);
-  //   streamController.add(data);
-  // }
-  //
-  // @override
-  // void initState() {
-  //   getMembers();
-  //   timer = Timer.periodic(Duration(seconds: 3), (timer) => getMembers());
-  //   super.initState();
-  // }
-  //
-  // @override
-  // void dispose() {
-  //   if (timer.isActive) {
-  //     timer.cancel();
-  //   }
-  //   super.dispose();
-  // }
+class Members extends StatelessWidget {
 
   Future popUp({
+    required BuildContext context,
     required String? nama,
     required String? id,
     required String? kelas,
@@ -108,12 +81,7 @@ class _MembersState extends State<Members> {
                   iconSize: 30,
                   splashColor: Colors.orange[300],
                   onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => AddMember(),
-                      ),
-                    );
+                    Get.toNamed(AddMember.TAG);
                   },
                 ),
               ),
@@ -161,6 +129,7 @@ class _MembersState extends State<Members> {
                           gender: data.gender,
                           onTap: (){
                            popUp(
+                             context: context,
                              id: data.id,
                              nama: data.nama,
                              kelas: data.kelas,
@@ -179,39 +148,7 @@ class _MembersState extends State<Members> {
             },
           ),
 
-          ///CARD ANGGOTA WITH STREAM BUILDER
-          // StreamBuilder(
-          //   stream: streamController.stream,
-          //   builder: (context, snapshot) {
-          //     if (snapshot.data == null) {
-          //       return SliverList(
-          //         delegate: SliverChildListDelegate(
-          //           [
-          //             Container(
-          //               height: MediaQuery.of(context).size.height,
-          //               width: MediaQuery.of(context).size.width,
-          //               child: Center(
-          //                 child: CircularProgressIndicator(),
-          //               ),
-          //             ),
-          //           ],
-          //         ),
-          //       );
-          //     } else {
-          //       return SliverList(
-          //         delegate: SliverChildBuilderDelegate(
-          //           (BuildContext context, int index) {
-          //             return cardMember(context, snapshot, index);
-          //           },
-          //           childCount: snapshot.data.length,
-          //         ),
-          //       );
-          //     }
-          //   },
-          // ),
-
           //MARGIN TO NAVBAR
-
           SliverToBoxAdapter(
             child: Container(
               margin: EdgeInsets.only(bottom: 40, top: 40),
@@ -285,11 +222,9 @@ class _MembersState extends State<Members> {
                   borderRadius: BorderRadius.circular(20),
                 ),
                 onPressed: () {
-                  Navigator.pushReplacement(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => UpdateMember(id: id)),
-                  );
+                  Get.back();
+                  Get.toNamed('${UpdateMember.TAG}/$id');
+                  //Get.to(UpdateMember(id: id));
                 },
               ),
 
